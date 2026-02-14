@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pth
+.ipynb_checkpoints/
+.cache/
+workspace_backup.zip
+.gemini/

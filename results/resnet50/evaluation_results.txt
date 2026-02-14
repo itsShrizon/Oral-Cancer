@@ -1,0 +1,28 @@
+BINARY CLASSIFICATION RESULTS (Benign vs Malignant)
+============================================================
+Accuracy:  0.9603
+Precision: 0.9604
+Recall:    0.9603
+F1-Score:  0.9603
+
+SUBTYPE CLASSIFICATION RESULTS
+============================================================
+Accuracy:  0.9392
+Precision: 0.9390
+Recall:    0.9392
+F1-Score:  0.9388
+
+Per-Class Report:
+              precision    recall  f1-score   support
+
+         CaS       0.95      0.96      0.95       128
+         CoS       0.98      0.99      0.99       120
+         Gum       0.97      0.97      0.97        96
+          MC       0.91      0.94      0.93       144
+          OC       0.90      0.81      0.85        86
+         OLP       0.94      0.92      0.93       144
+          OT       0.93      0.95      0.94       105
+
+    accuracy                           0.94       823
+   macro avg       0.94      0.94      0.94       823
+weighted avg       0.94      0.94      0.94       823
