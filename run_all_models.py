@@ -9,7 +9,10 @@ MODELS = [
     'densenet121',
     'convnext_tiny',
     'swin_t',
-    'efficientnet_b0'
+    'efficientnet_b0',
+    'efficientnet_v2b2',
+    'efficientnet_v2b3',
+    'efficientnet_v2s'
 ]
 
 def run_command(command, log_file=None):
@@ -53,14 +56,22 @@ def main():
                 continue
             
         # 2. Evaluate
-        print(f"\n--- Evaluating {model} ---")
-        eval_cmd = [sys.executable, 'evaluate_final.py', '--backbone', model, '--no-confirm']
-        run_command(eval_cmd)
+        results_file = os.path.join('results', model, 'evaluation_results.txt')
+        if os.path.exists(results_file):
+            print(f"\n--- Skipping evaluation for {model} (results already exist) ---")
+        else:
+            print(f"\n--- Evaluating {model} ---")
+            eval_cmd = [sys.executable, 'evaluate_final.py', '--backbone', model, '--no-confirm']
+            run_command(eval_cmd)
         
         # 3. Visualize (generates prediction_samples.png, confusion_matrices.png, detailed_prediction_grid.png)
-        print(f"\n--- Visualizing {model} ---")
-        viz_cmd = [sys.executable, 'visualize_predictions.py', '--backbone', model]
-        run_command(viz_cmd)
+        viz_file = os.path.join('results', model, 'prediction_samples.png')
+        if os.path.exists(viz_file):
+            print(f"\n--- Skipping visualization for {model} (visualizations already exist) ---")
+        else:
+            print(f"\n--- Visualizing {model} ---")
+            viz_cmd = [sys.executable, 'visualize_predictions.py', '--backbone', model]
+            run_command(viz_cmd)
         
         print(f"✅ Completed {model}")
 

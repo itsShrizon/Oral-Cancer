@@ -10,6 +10,9 @@ BACKBONE_MAP = {
     'convnext_tiny': 'convnext_tiny',
     'swin_t': 'swin_tiny_patch4_window7_224',
     'efficientnet_b0': 'efficientnet_b0',
+    'efficientnet_v2b2': 'tf_efficientnetv2_b2',
+    'efficientnet_v2b3': 'tf_efficientnetv2_b3',
+    'efficientnet_v2s': 'tf_efficientnetv2_s',
 }
 
 class MultiTaskOralClassifier(nn.Module):

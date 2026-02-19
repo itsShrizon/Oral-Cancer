@@ -29,6 +29,9 @@ NUM_WORKERS = 8
 # 'convnext_tiny'   - ConvNeXt Tiny
 # 'swin_t'          - Swin Transformer Tiny
 # 'efficientnet_b0' - EfficientNet B0
+# 'efficientnet_v2b2' - EfficientNet V2-B2
+# 'efficientnet_v2b3' - EfficientNet V2-B3
+# 'efficientnet_v2s'  - EfficientNet V2-S
 BACKBONE = 'swin_t'
 DROPOUT = 0.5
 USE_PRETRAINED = False  
