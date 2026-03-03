@@ -12,7 +12,8 @@ MODELS = [
     'efficientnet_b0',
     'efficientnet_v2b2',
     'efficientnet_v2b3',
-    'efficientnet_v2s'
+    'efficientnet_v2s',
+    'custom_efficientnet_v2',
 ]
 
 def run_command(command, log_file=None):
@@ -44,10 +45,11 @@ def main():
         print(f"🚀 PROCESSING MODEL: {model}")
         print(f"{'='*40}")
         
-        # 1. Train (skip if model already exists)
+        # 1. Train (skip if model or evaluation results already exist)
         model_path = os.path.join('results', model, 'best_model.pth')
-        if os.path.exists(model_path):
-            print(f"\n--- Skipping training for {model} (model already exists) ---")
+        results_file = os.path.join('results', model, 'evaluation_results.txt')
+        if os.path.exists(model_path) or os.path.exists(results_file):
+            print(f"\n--- Skipping training for {model} (already completed) ---")
         else:
             print(f"\n--- Training {model} ---")
             train_cmd = [sys.executable, 'train.py', '--backbone', model]

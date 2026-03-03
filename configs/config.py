@@ -3,7 +3,7 @@ import torch
 
 # Base Paths (Updated for local usage or specific environment if needed)
 # NOTE: Update BASE_PATH to match your actual data location
-BASE_PATH = '/workspace'
+BASE_PATH = '/workspace/Oral-Cancer'
 
 # Dataset 1 Paths
 DS1_ORIGINAL_BENIGN = os.path.join(BASE_PATH, 'Dataset 1', 'original_data', 'benign_lesions')

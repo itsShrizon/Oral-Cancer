@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import timm
 from configs.config import NUM_SUBTYPES, BACKBONE, DROPOUT, USE_PRETRAINED
+from models.custom_efficientnet import CustomEfficientNetV2
 
 # Map user-friendly names to timm model names
 BACKBONE_MAP = {
@@ -13,6 +14,7 @@ BACKBONE_MAP = {
     'efficientnet_v2b2': 'tf_efficientnetv2_b2',
     'efficientnet_v2b3': 'tf_efficientnetv2_b3',
     'efficientnet_v2s': 'tf_efficientnetv2_s',
+    'custom_efficientnet_v2': 'custom',  # handled separately
 }
 
 class MultiTaskOralClassifier(nn.Module):
@@ -37,12 +39,18 @@ class MultiTaskOralClassifier(nn.Module):
         timm_model_name = BACKBONE_MAP[self.backbone_name]
         print(f"Initializing {self.backbone_name} ({timm_model_name}) with pretrained={self.use_pretrained}")
         
-        # Initialize backbone using timm
-        self.backbone = timm.create_model(
-            timm_model_name, 
-            pretrained=self.use_pretrained, 
-            num_classes=0
-        )
+        # Initialize backbone
+        if self.backbone_name == 'custom_efficientnet_v2':
+            # Custom model as feature extractor (num_classes=0)
+            self.backbone = CustomEfficientNetV2(
+                num_classes=0, pretrained=self.use_pretrained
+            )
+        else:
+            self.backbone = timm.create_model(
+                timm_model_name, 
+                pretrained=self.use_pretrained, 
+                num_classes=0
+            )
         
         # Automatically get the number of output features from the backbone
         num_features = self.backbone.num_features
