@@ -124,7 +124,10 @@ def get_gradcam_target_layer(model, backbone_name):
     backbone = model.backbone
     try:
         if backbone_name == 'custom_efficientnet_v2':
-            return [backbone.stage5], None
+            # stage5 is the final donor block (heavily channel-mixed → spotty CAMs).
+            # stage4 is the AttentionHub, where spatial structure is still intact
+            # and the attention re-weighting tends to align with lesion regions.
+            return [backbone.stage4], None
 
         elif backbone_name == 'resnet50':
             return [backbone.layer4[-1]], None
@@ -136,10 +139,16 @@ def get_gradcam_target_layer(model, backbone_name):
             return [backbone.stages[-1].blocks[-1]], None
 
         elif backbone_name == 'swin_t':
-            # Swin outputs (B, H*W, C) - need to reshape to (B, C, H, W) for GradCAM
-            def swin_reshape(tensor, height=7, width=7):
-                result = tensor.reshape(tensor.size(0), height, width, tensor.size(2))
-                return result.permute(0, 3, 1, 2)
+            # Modern timm Swin emits a 4-D tensor (B, H, W, C) at this layer;
+            # older versions emit (B, H*W, C). Handle both → (B, C, H, W).
+            def swin_reshape(tensor):
+                if tensor.dim() == 4:
+                    # already (B, H, W, C)
+                    return tensor.permute(0, 3, 1, 2).contiguous()
+                # (B, L, C) → (B, H, W, C) → (B, C, H, W)
+                B, L, C = tensor.shape
+                H = W = int(L ** 0.5)
+                return tensor.reshape(B, H, W, C).permute(0, 3, 1, 2).contiguous()
             return [backbone.layers[-1].blocks[-1].norm1], swin_reshape
 
         elif backbone_name in ('efficientnet_b0', 'efficientnet_v2b2',
