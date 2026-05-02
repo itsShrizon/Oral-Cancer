@@ -1,0 +1,15 @@
+{
+  "backbone": "convnext_tiny",
+  "binary": {
+    "accuracy": 0.9532,
+    "precision": 0.9535,
+    "recall": 0.9532,
+    "f1_score": 0.9533
+  },
+  "subtype": {
+    "accuracy": 0.9046,
+    "precision": 0.9069,
+    "recall": 0.9046,
+    "f1_score": 0.9048
+  }
+}

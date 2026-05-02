@@ -1,0 +1,15 @@
+{
+  "backbone": "swin_t",
+  "binary": {
+    "accuracy": 0.9819,
+    "precision": 0.9819,
+    "recall": 0.9819,
+    "f1_score": 0.9819
+  },
+  "subtype": {
+    "accuracy": 0.9769,
+    "precision": 0.9773,
+    "recall": 0.9769,
+    "f1_score": 0.9769
+  }
+}

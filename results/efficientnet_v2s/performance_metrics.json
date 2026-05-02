@@ -1,0 +1,27 @@
+{
+  "backbone": "efficientnet_v2s",
+  "model_size_mb": 82.86,
+  "flops_raw": 5699862400,
+  "flops_gflops": 5.7,
+  "num_parameters": 21493849,
+  "batch_time_ms": 43.362,
+  "estimated_epoch_time_s": 2.342,
+  "inference_time_ms_mean": 19.107,
+  "inference_time_ms_std": 0.2,
+  "gpu_peak_mb": 126.94,
+  "cpu_rss_mb": null,
+  "carbon_emission_kg_co2": 4e-06,
+  "energy_kwh": 1.715e-05,
+  "energy_source": "estimated (install codecarbon for accuracy)",
+  "latency_distribution": {
+    "mean_ms": 20.422,
+    "std_ms": 2.553,
+    "min_ms": 18.892,
+    "max_ms": 25.801,
+    "p50_ms": 19.117,
+    "p90_ms": 25.451,
+    "p95_ms": 25.595,
+    "p99_ms": 25.782
+  },
+  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+}

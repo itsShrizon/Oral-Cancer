@@ -1,0 +1,15 @@
+{
+  "backbone": "resnet50",
+  "binary": {
+    "accuracy": 0.9912,
+    "precision": 0.9912,
+    "recall": 0.9912,
+    "f1_score": 0.9912
+  },
+  "subtype": {
+    "accuracy": 0.9909,
+    "precision": 0.9909,
+    "recall": 0.9909,
+    "f1_score": 0.9909
+  }
+}

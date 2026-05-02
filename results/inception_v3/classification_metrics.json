@@ -1,0 +1,15 @@
+{
+  "backbone": "inception_v3",
+  "binary": {
+    "accuracy": 0.993,
+    "precision": 0.993,
+    "recall": 0.993,
+    "f1_score": 0.993
+  },
+  "subtype": {
+    "accuracy": 0.9921,
+    "precision": 0.9922,
+    "recall": 0.9921,
+    "f1_score": 0.9921
+  }
+}

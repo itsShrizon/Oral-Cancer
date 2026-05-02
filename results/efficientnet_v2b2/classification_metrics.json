@@ -1,0 +1,15 @@
+{
+  "backbone": "efficientnet_v2b2",
+  "binary": {
+    "accuracy": 0.9936,
+    "precision": 0.9936,
+    "recall": 0.9936,
+    "f1_score": 0.9936
+  },
+  "subtype": {
+    "accuracy": 0.9933,
+    "precision": 0.9934,
+    "recall": 0.9933,
+    "f1_score": 0.9933
+  }
+}
