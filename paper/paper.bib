@@ -1,0 +1,477 @@
+% =============================================================================
+% paper.bib — Bibliography for:
+%   "A Parameter-Efficient Dual-Head Oral Disease Classifier with an
+%    Ablation-Driven Triplet→SE Attention Cascade"
+%
+% KEY MAP (alphabetical by key)
+% ----------------------------------------------------------------------------
+%  chattopadhyay2018gradcampp  — Grad-CAM++ (Chattopadhyay et al., WACV 2018)
+%  he2016resnet                — Deep Residual Learning / ResNet (He et al., CVPR 2016)
+%  hu2018se                    — Squeeze-and-Excitation Networks (Hu et al., CVPR 2018)
+%  huang2017densenet           — DenseNet (Huang et al., CVPR 2017)
+%  kingma2015adam              — Adam optimiser (Kingma & Ba, ICLR 2015)
+%  liu2021swin                 — Swin Transformer (Liu et al., ICCV 2021)
+%  liu2022convnext             — ConvNeXt / A ConvNet for the 2020s (Liu et al., CVPR 2022)
+%  liu2024kan                  — KAN: Kolmogorov-Arnold Networks (Liu et al., arXiv 2024)
+%  misra2021triplet            — Triplet Attention (Misra et al., WACV 2021)
+%  ouyang2023ema               — Efficient Multi-Scale Attention / EMA (Ouyang et al., ICASSP 2023)
+%  park2018bam                 — BAM: Bottleneck Attention Module (Park et al., BMVC 2018)
+%  ref3                        — CNN-based RAU detection with transfer learning  [PLACEHOLDER]
+%  ref5                        — Lightweight CNN (EfficientNet-B0) oral cancer detection, ~90% acc (Jubair et al., 2022)
+%  ref15                       — CLASEG segmentation/classification framework (Al-Ali et al., Sci. Reports 2025)
+%  ref16                       — SE-MobileViT oral cancer detection, 98.39% acc (Kabir et al., 2025)
+%  ref17                       — LBP + deep CNN feature fusion for oral cancer  [PLACEHOLDER]
+%  ref18                       — Vision Transformer vs radiomics for oral lesion classification (Chilet-Martos et al., 2025)
+%  ref19                       — Multiclass CNN benchmark on oral mucosal lesions (Rashid et al., MTA 2024)
+%  ref21                       — DeiT + CoAtNet hybrid for oral/dental disease   [PLACEHOLDER — dental, not oral]
+%  ref22                       — MODC-SET ensemble for 7-class oral disease      [PLACEHOLDER — unconfirmed]
+%  ref23                       — AI systematic review OLP/RAS/leukoplakia (Tiwari et al., Cureus 2023)
+%  ref24                       — ChatGPT-5 vs oral-medicine experts (Abou-Bakr et al., Odontology 2025)
+%  ref26                       — HF-UNet oral ulcer segmentation (Jiang et al., Sci. Reports 2024)
+%  ribeiro2016lime             — LIME (Ribeiro et al., KDD 2016)
+%  selvaraju2017gradcam        — Grad-CAM (Selvaraju et al., ICCV 2017)
+%  szegedy2016inceptionv3      — Inception-v3 (Szegedy et al., CVPR 2016)
+%  tan2019efficientnet         — EfficientNet (Tan & Le, ICML 2019)
+%  tan2021effv2                — EfficientNetV2 (Tan & Le, ICML 2021)
+%  woo2018cbam                 — CBAM (Woo et al., ECCV 2018)
+% =============================================================================
+
+
+% =============================================================================
+% PART A — METHOD AND BACKBONE REFERENCES
+% Well-established papers; details verified from primary publication records.
+% =============================================================================
+
+@inproceedings{hu2018se,
+  author    = {Hu, Jie and Shen, Li and Sun, Gang},
+  title     = {Squeeze-and-Excitation Networks},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and
+               Pattern Recognition ({CVPR})},
+  pages     = {7132--7141},
+  year      = {2018},
+  doi       = {10.1109/CVPR.2018.00745}
+}
+
+@inproceedings{woo2018cbam,
+  author    = {Woo, Sanghyun and Park, Jongchan and Lee, Joon-Young and
+               Kweon, In So},
+  title     = {{CBAM}: Convolutional Block Attention Module},
+  booktitle = {Proceedings of the European Conference on Computer Vision
+               ({ECCV})},
+  pages     = {3--19},
+  year      = {2018},
+  doi       = {10.1007/978-3-030-01234-2_1}
+}
+
+@inproceedings{park2018bam,
+  author    = {Park, Jongchan and Woo, Sanghyun and Lee, Joon-Young and
+               Kweon, In So},
+  title     = {{BAM}: Bottleneck Attention Module},
+  booktitle = {Proceedings of the British Machine Vision Conference ({BMVC})},
+  year      = {2018}
+}
+
+@inproceedings{misra2021triplet,
+  author    = {Misra, Diganta and Nalamada, Trikay and Arasanipalai, Ajay Uppili
+               and Hou, Qibin},
+  title     = {Rotate to Attend: Convolutional Triplet Attention Module},
+  booktitle = {Proceedings of the {IEEE} Winter Conference on Applications of
+               Computer Vision ({WACV})},
+  pages     = {3139--3148},
+  year      = {2021},
+  doi       = {10.1109/WACV48630.2021.00318}
+}
+
+@inproceedings{tan2021effv2,
+  author    = {Tan, Mingxing and Le, Quoc V.},
+  title     = {{EfficientNetV2}: Smaller Models and Faster Training},
+  booktitle = {Proceedings of the International Conference on Machine Learning
+               ({ICML})},
+  pages     = {10096--10106},
+  year      = {2021}
+}
+
+@inproceedings{tan2019efficientnet,
+  author    = {Tan, Mingxing and Le, Quoc V.},
+  title     = {{EfficientNet}: Rethinking Model Scaling for Convolutional Neural
+               Networks},
+  booktitle = {Proceedings of the International Conference on Machine Learning
+               ({ICML})},
+  pages     = {6105--6114},
+  year      = {2019}
+}
+
+@inproceedings{selvaraju2017gradcam,
+  author    = {Selvaraju, Ramprasaath R. and Cogswell, Michael and Das, Abhishek
+               and Vedantam, Ramakrishna and Parikh, Devi and Batra, Dhruv},
+  title     = {{Grad-CAM}: Visual Explanations from Deep Networks via
+               Gradient-Based Localization},
+  booktitle = {Proceedings of the {IEEE} International Conference on Computer
+               Vision ({ICCV})},
+  pages     = {618--626},
+  year      = {2017},
+  doi       = {10.1109/ICCV.2017.74}
+}
+
+@inproceedings{chattopadhyay2018gradcampp,
+  author    = {Chattopadhyay, Aditya and Sarkar, Anirban and Howlader, Prantik
+               and Balasubramanian, Vineeth N.},
+  title     = {{Grad-CAM++}: Improved Visual Explanations for Deep Convolutional
+               Networks},
+  booktitle = {Proceedings of the {IEEE} Winter Conference on Applications of
+               Computer Vision ({WACV})},
+  pages     = {839--847},
+  year      = {2018},
+  doi       = {10.1109/WACV.2018.00097}
+}
+
+@inproceedings{ribeiro2016lime,
+  author    = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+  title     = {``{W}hy Should {I} Trust You?'': Explaining the Predictions of
+               Any Classifier},
+  booktitle = {Proceedings of the {ACM SIGKDD} International Conference on
+               Knowledge Discovery and Data Mining ({KDD})},
+  pages     = {1135--1144},
+  year      = {2016},
+  doi       = {10.1145/2939672.2939778}
+}
+
+@inproceedings{he2016resnet,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  title     = {Deep Residual Learning for Image Recognition},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and
+               Pattern Recognition ({CVPR})},
+  pages     = {770--778},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.90}
+}
+
+@inproceedings{huang2017densenet,
+  author    = {Huang, Gao and Liu, Zhuang and van der Maaten, Laurens and
+               Weinberger, Kilian Q.},
+  title     = {Densely Connected Convolutional Networks},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and
+               Pattern Recognition ({CVPR})},
+  pages     = {4700--4708},
+  year      = {2017},
+  doi       = {10.1109/CVPR.2017.243}
+}
+
+@inproceedings{liu2022convnext,
+  author    = {Liu, Zhuang and Mao, Hanzi and Wu, Chao-Yuan and Feichtenhofer,
+               Christoph and Darrell, Trevor and Xie, Saining},
+  title     = {A {ConvNet} for the 2020s},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and
+               Pattern Recognition ({CVPR})},
+  pages     = {11976--11986},
+  year      = {2022},
+  doi       = {10.1109/CVPR52688.2022.01167}
+}
+
+@inproceedings{liu2021swin,
+  author    = {Liu, Ze and Lin, Yutong and Cao, Yue and Hu, Han and Wei,
+               Yixuan and Zhang, Zheng and Lin, Stephen and Guo, Baining},
+  title     = {Swin Transformer: Hierarchical Vision Transformer Using
+               Shifted Windows},
+  booktitle = {Proceedings of the {IEEE} International Conference on Computer
+               Vision ({ICCV})},
+  pages     = {10012--10022},
+  year      = {2021},
+  doi       = {10.1109/ICCV48922.2021.00986}
+}
+
+@inproceedings{szegedy2016inceptionv3,
+  author    = {Szegedy, Christian and Vanhoucke, Vincent and Ioffe, Sergey and
+               Shlens, Jon and Wojna, Zbigniew},
+  title     = {Rethinking the Inception Architecture for Computer Vision},
+  booktitle = {Proceedings of the {IEEE} Conference on Computer Vision and
+               Pattern Recognition ({CVPR})},
+  pages     = {2818--2826},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.308}
+}
+
+@misc{kingma2015adam,
+  author    = {Kingma, Diederik P. and Ba, Jimmy},
+  title     = {Adam: A Method for Stochastic Optimization},
+  year      = {2015},
+  note      = {Published as a conference paper at {ICLR} 2015},
+  eprint    = {1412.6980},
+  archiveprefix = {arXiv}
+}
+
+@inproceedings{ouyang2023ema,
+  author    = {Ouyang, Daliang and He, Su and Zhang, Guozhong and Luo, Mingzhu
+               and Guo, Huaiyong and Zhan, Jian and Huang, Zhijie},
+  title     = {Efficient Multi-Scale Attention Module with Cross-Spatial
+               Learning},
+  booktitle = {{ICASSP} 2023 --- {IEEE} International Conference on Acoustics,
+               Speech and Signal Processing},
+  pages     = {1--5},
+  year      = {2023},
+  doi       = {10.1109/ICASSP49357.2023.10096516}
+}
+
+@misc{liu2024kan,
+  author    = {Liu, Ziming and Wang, Yixuan and Vaidya, Sachin and Ruehle,
+               Fabian and Halverson, James and Solja{\v{c}}i{\'{c}}, Marin and
+               Hou, Thomas Y. and Tegmark, Max},
+  title     = {{KAN}: {K}olmogorov-{A}rnold Networks},
+  year      = {2024},
+  eprint    = {2404.19756},
+  archiveprefix = {arXiv}
+}
+
+
+% =============================================================================
+% PART B — DOMAIN / RELATED-WORK REFERENCES
+% Keys match the citation numbers used in PAPER.md.
+% Verified entries are labelled [VERIFIED]; placeholders are [PLACEHOLDER].
+% =============================================================================
+
+% ---- [3] ---- RAU / transfer-learning CNN ---- [PLACEHOLDER] ----------------
+% PAPER.md §2.2: "CNN-based framework…transfer learning with ResNet variants to
+% distinguish ulcer and non-ulcer classes…above 85% accuracy…modest clinical
+% dataset."
+%
+% Closest candidate found by search: Zhou et al. (2024) in J Dent Sci (ResNet50,
+% 92.86% on RAU classification, 785 clinical images) — but that paper reports
+% 92%, not ≥85%, and covers three classes (RAU, normal, other). It is NOT listed
+% here because the description in PAPER.md ("binary ulcer/non-ulcer") does not
+% match well enough to assert identity with confidence.
+% See CITATIONS_TODO.md for details.
+@misc{ref3,
+  author    = {{Author(s)}},
+  title     = {{CNN}-based recurrent aphthous ulcer detection with transfer
+               learning},
+  year      = {2024},
+  note      = {CITATION PENDING --- verify exact reference against the
+               manuscript's master reference list. PAPER.md~\S2.2 describes a
+               binary ulcer/non-ulcer ResNet transfer-learning model achieving
+               above 85\% accuracy on a modest clinical dataset. Closest
+               candidate: Zhou et al.\ (2024), \textit{J Dent Sci},
+               19(1):254--260, DOI~10.1016/j.jds.2023.04.022 --- but that
+               paper is 3-class and reports 92.86\%.}
+}
+
+% ---- [5] ---- Jubair 2022 lightweight CNN oral cancer ---- [VERIFIED] -------
+% PAPER.md §2.1: "transfer learning to compensate for limited clinical data…
+% approximately 90% classification accuracy between malignant and non-malignant."
+% Jubair et al. (2022), Oral Diseases 28:1123-1130, EfficientNet-B0, 716 images,
+% accuracy 85% (95% CI 81-90%). Matches description well.
+% NOTE: PAPER.md says "approximately 90%"; actual reported point estimate is 85%
+% (CI upper bound 90%). Flagged in CITATIONS_TODO.md.
+@article{ref5,
+  author    = {Jubair, Firas and Al-Karadsheh, Omar and Malamos, Demetrios
+               and Al Mahdi, Suha and Saad, Yusuf and Hassona, Yazan},
+  title     = {A Novel Lightweight Deep Convolutional Neural Network for
+               Early Detection of Oral Cancer},
+  journal   = {Oral Diseases},
+  volume    = {28},
+  pages     = {1123--1130},
+  year      = {2022},
+  doi       = {10.1111/odi.13825}
+}
+
+% ---- [15] ---- CLASEG ---- [VERIFIED] ----------------------------------------
+% Al-Ali et al., Scientific Reports vol.15, article 23016, 2025.
+% DOI: 10.1038/s41598-025-03268-1
+% MISMATCH: PAPER.md §2.3 describes "U-Net-like architecture…Dice/IoU metrics."
+% Real paper: EfficientNet-B3 + Mask R-CNN on 14 oral lesion classes,
+% classification accuracy 74.49%, AP50 72.18. See CITATIONS_TODO.md.
+@article{ref15,
+  author    = {Al-Ali, Abdulhadi and Hamdi, Atif and Elshrif, Mohamed and
+               Isufaj, Kaltrina and Shaban, Khaled and Chauvin, Philippe and
+               Madathil, Sobha and Daer, Ahmad and Tamimi, Faleh and
+               Ba-Hattab, Roudan},
+  title     = {{CLASEG}: Advanced Multiclassification and Segmentation for
+               Differential Diagnosis of Oral Lesions Using Deep Learning},
+  journal   = {Scientific Reports},
+  volume    = {15},
+  pages     = {23016},
+  year      = {2025},
+  doi       = {10.1038/s41598-025-03268-1}
+}
+
+% ---- [16] ---- SE-MobileViT ---- [VERIFIED] ----------------------------------
+% Kabir et al., Discover Artificial Intelligence vol.5, article 173, 2025.
+% DOI: 10.1007/s44163-025-00442-2
+% MISMATCH: PAPER.md §2.1 says "above 92%"; actual reported accuracy is 98.39%.
+% See CITATIONS_TODO.md.
+@article{ref16,
+  author    = {Kabir, Md Firoz and Ahmad, Md Yousuf and Uddin, Roise and
+               Cordero, Martin and Kant, Shashi},
+  title     = {Accurate and Lightweight Oral Cancer Detection Using
+               {SE-MobileViT} on Clinically Validated Image Dataset},
+  journal   = {Discover Artificial Intelligence},
+  volume    = {5},
+  pages     = {173},
+  year      = {2025},
+  doi       = {10.1007/s44163-025-00442-2}
+}
+
+% ---- [17] ---- LBP + deep CNN feature fusion ---- [PLACEHOLDER] -------------
+% PAPER.md §2.1: "ensemble…fuses Local Binary Pattern (LBP) descriptors with
+% deep CNN features, reaching approximately 90% binary accuracy with improved
+% robustness to illumination and texture variation."
+% No paper found that confidently matches this exact description (LBP + CNN
+% ensemble, ~90% binary oral cancer, illumination/texture robustness claim).
+% See CITATIONS_TODO.md.
+@misc{ref17,
+  author    = {{Author(s)}},
+  title     = {{LBP} and Deep {CNN} Feature Fusion for Oral Cancer Detection},
+  year      = {2022},
+  note      = {CITATION PENDING --- verify exact reference against the
+               manuscript's master reference list. PAPER.md~\S2.1 describes an
+               ensemble fusing Local Binary Pattern (LBP) descriptors with deep
+               CNN features, achieving approximately 90\% binary accuracy with
+               improved robustness to illumination and texture variation.
+               No confident match found in literature search.}
+}
+
+% ---- [18] ---- ViT vs radiomics ---- [VERIFIED] -----------------------------
+% Chilet-Martos et al., Computers in Biology and Medicine, Feb 2025.
+% DOI: 10.1016/j.compbiomed.2025.109XXX (article number to be confirmed from
+% published record; PII S0010482525002641 confirmed on ScienceDirect).
+% PAPER.md §2.5: "ViT variants benefiting from improved global feature
+% extraction; accuracies competitive with CNN baselines; no ablation within ViT."
+% Match is moderate: paper is a ViT-vs-radiomics comparison, not purely
+% accuracy competition. Flagged in CITATIONS_TODO.md.
+@article{ref18,
+  author    = {Chilet-Martos, Eva and Vila-Fran{\'{e}}s, Joan and Bagan,
+               Jose V. and Vives-Gilabert, Yolanda},
+  title     = {Automated Classification of Oral Cancer Lesions: Vision
+               Transformers vs Radiomics},
+  journal   = {Computers in Biology and Medicine},
+  volume    = {189},
+  year      = {2025},
+  note      = {Published February 2025. DOI and article number not confirmed
+               from primary source (paywall). ScienceDirect PII:
+               S0010482525002641. Verify and add \texttt{doi} field before
+               submission.}
+}
+
+% ---- [19] ---- Multi-class oral mucosal lesion CNN benchmark ---- [VERIFIED] -
+% Rashid et al., Multimedia Tools and Applications vol.83, pp.33903-33921, 2024.
+% DOI: 10.1007/s11042-023-16776-x
+% PAPER.md §2.4: "evaluated several CNN backbones on intraoral images under
+% unified preprocessing…generalization across patient demographics."
+% InceptionResNetV2 model achieves 99.51% — this is a single-model result, not
+% a multi-backbone comparison per se. Flagged in CITATIONS_TODO.md.
+@article{ref19,
+  author    = {Rashid, Javed and Qaisar, Bilal Shabbir and Faheem, Muhammad
+               and Akram, Arslan and Amin, Riaz ul and Hamid, Muhammad},
+  title     = {Mouth and Oral Disease Classification Using {InceptionResNetV2}
+               Method},
+  journal   = {Multimedia Tools and Applications},
+  volume    = {83},
+  pages     = {33903--33921},
+  year      = {2024},
+  doi       = {10.1007/s11042-023-16776-x}
+}
+
+% ---- [21] ---- DeiT + CoAtNet hybrid ---- [PLACEHOLDER] --------------------
+% PAPER.md §2.5: "combined DeiT and CoAtNet for oral disease classification,
+% achieving strong multi-class performance."
+% The only DeiT+CoAtNet paper found (Elazab et al., Sci. Reports 16:805, 2026)
+% is a DENTAL radiograph paper (cavities, fillings, implants) — NOT an oral
+% disease / mucosal-lesion paper. Cannot assert identity.
+% See CITATIONS_TODO.md.
+@misc{ref21,
+  author    = {{Author(s)}},
+  title     = {{DeiT} and {CoAtNet} Hybrid Architecture for Oral Disease
+               Classification},
+  year      = {2024},
+  note      = {CITATION PENDING --- verify exact reference against the
+               manuscript's master reference list. PAPER.md~\S2.5 describes a
+               hybrid DeiT + CoAtNet model achieving strong multi-class
+               performance on oral disease classification. The only matching
+               paper found (Elazab et al., \textit{Scientific Reports}
+               16:805, 2026, DOI~10.1038/s41598-025-32514-9) is a DENTAL
+               radiograph study (not oral mucosal lesions) --- identity cannot
+               be asserted without author confirmation.}
+}
+
+% ---- [22] ---- MODC-SET ensemble ---- [PLACEHOLDER] -------------------------
+% PAPER.md §2.4 and §9.2: "MODC-SET…ensemble of MobileNetV2 + InceptionResNetV2
+% + ResNet50 with XGBoost meta-classifier…7 oral disease categories…99.32%
+% overall accuracy."
+% No paper with the acronym MODC-SET and this exact description has been
+% confidently identified. The closest candidate by disease taxonomy is Rashid
+% et al. (ref19) but that paper uses InceptionResNetV2 alone (not an ensemble)
+% and reports 99.51%. Not the same paper. See CITATIONS_TODO.md.
+@misc{ref22,
+  author    = {{Author(s)}},
+  title     = {{MODC-SET}: Multi-Model Oral Disease Classification with
+               Stacking Ensemble Technique},
+  year      = {2024},
+  note      = {CITATION PENDING --- the MODC-SET acronym and the combination
+               (MobileNetV2 + InceptionResNetV2 + ResNet50 + XGBoost
+               meta-classifier, 99.32\% accuracy on 7-class oral disease)
+               could not be confirmed in the indexed literature.
+               Verify the full bibliographic record against the manuscript's
+               master reference list before submission.}
+}
+
+% ---- [23] ---- AI systematic review OLP / RAS / leukoplakia ---- [VERIFIED] -
+% Tiwari et al., Cureus 15(9):e45187, 2023. DOI: 10.7759/cureus.45187
+% PAPER.md §2.2: "systematic review [23] surveyed sixteen AI studies focused on
+% OLP, RAS, and leukoplakia, reporting accuracies from 71% to 100%."
+% Paper reviews 23 included articles (not 16) covering mouth ulcers, OLP, RAU,
+% leukoplakia. Accuracy range matches (71%-100% appears in reviewed studies).
+% Minor discrepancy: PAPER.md says "sixteen studies"; actual paper included 23.
+% Flagged in CITATIONS_TODO.md.
+@article{ref23,
+  author    = {Tiwari, Anushree and Gupta, Neha and Singla, Deepika and
+               Swain, Jnana Ranjan and Gupta, Ruchi and Mehta, Dhaval and
+               Kumar, Santosh},
+  title     = {Artificial Intelligence's Use in the Diagnosis of Mouth
+               Ulcers: A Systematic Review},
+  journal   = {Cureus},
+  volume    = {15},
+  number    = {9},
+  pages     = {e45187},
+  year      = {2023},
+  doi       = {10.7759/cureus.45187}
+}
+
+% ---- [24] ---- ChatGPT-5 oral medicine ---- [VERIFIED] ----------------------
+% Abou-Bakr, El Barbary, Hassanein; Odontology, 2025 (online ahead of print).
+% DOI: 10.1007/s10266-025-01242-x
+% PAPER.md §2.5: "ChatGPT-5…tested…OLP / oral lichen lesions / SCC-over-LP…
+% approximately 85% accuracy."
+% Actual paper: 100 biopsy-confirmed cases; Top-1/Top-3/Top-5 accuracy reported;
+% does not appear to claim an overall 85% figure. Flagged in CITATIONS_TODO.md.
+@article{ref24,
+  author    = {Abou-Bakr, Asmaa and El Barbary, Ahmed and Hassanein, Fatma E. A.},
+  title     = {{ChatGPT}-5 vs Oral Medicine Experts for Rank-Based Differential
+               Diagnosis of Oral Lesions: A Prospective, Biopsy-Validated
+               Comparison},
+  journal   = {Odontology},
+  year      = {2025},
+  doi       = {10.1007/s10266-025-01242-x},
+  note      = {Online ahead of print as of 2025. Volume, issue, and page
+               numbers not yet assigned.}
+}
+
+% ---- [26] ---- HF-UNet oral ulcer segmentation ---- [VERIFIED] --------------
+% Jiang et al., Scientific Reports vol.14, article 20085, 2024.
+% DOI: 10.1038/s41598-024-69125-9
+% PAPER.md §2.3: "hybrid CNN-Transformer…high-order focus convolution…
+% Sobel-based edge enhancement…420 images…five ulcer categories…Dice ≈82%…
+% sensitivity ≈85%…outperforming HF-UNet baseline."
+% Real paper: high-order focus interaction model (HFblock) + Sobel filter for
+% edge detection + HF-UNet — this IS the proposed model, not the baseline.
+% DSC ≈ 0.80, not 82%. Image count and category count should be verified
+% against full paper. Flagged in CITATIONS_TODO.md.
+@article{ref26,
+  author    = {Jiang, Chenghao and Wu, Renkai and Liu, Yinghao and Wang, Yue
+               and Chang, Qing and Liang, Pengchen and Fan, Yuan},
+  title     = {A High-Order Focus Interaction Model and Oral Ulcer Dataset
+               for Oral Ulcer Segmentation},
+  journal   = {Scientific Reports},
+  volume    = {14},
+  pages     = {20085},
+  year      = {2024},
+  doi       = {10.1038/s41598-024-69125-9}
+}

@@ -1,9 +1,9 @@
 {
   "backbone": "densenet121",
   "model_size_mb": 31.149,
-  "flops_raw": 5668381696,
-  "flops_gflops": 5.668,
-  "num_parameters": 8008073,
+  "flops_raw": 2834417664,
+  "flops_gflops": 2.834,
+  "num_parameters": 7924425,
   "batch_time_ms": 53.04,
   "estimated_epoch_time_s": 2.864,
   "inference_time_ms_mean": 19.601,
@@ -23,5 +23,5 @@
     "p95_ms": 23.769,
     "p99_ms": 31.305
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }

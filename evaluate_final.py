@@ -31,6 +31,7 @@ from data.transforms import val_transform
 from data.dataset import OralPathologyDataset, load_dataset1_split, load_dataset2_split
 from models.architecture import MultiTaskOralClassifier
 from utils.evaluation import evaluate_model, plot_confusion_matrix
+from utils.ablation import ABLATIONS, branches_for, run_name_for
 
 # ?? TTA transforms (same 5-view set used in custom_efficientnet_colab.py) ?
 _tta_transforms = [
@@ -109,19 +110,33 @@ def main():
                         help='Which trained checkpoint to evaluate. Must match the '
                              'recipe used during training. "baseline" disables TTA '
                              'for the custom model so the ablation is truly fair.')
+    parser.add_argument('--ablation', type=str, default=None,
+                        choices=sorted(ABLATIONS.keys()),
+                        help='Which AttentionHub ablation checkpoint to evaluate. '
+                             'Forces --recipe baseline (fair comparison).')
+    parser.add_argument('--hub-version', type=str, default='v1',
+                        choices=['v1', 'v2'],
+                        help='AttentionHub variant. v2 = sequential Triplet->EMA '
+                             '(forces --recipe baseline, incompatible with --ablation).')
     parser.add_argument('--no-confirm', action='store_true',
                         help='Skip the confirmation prompt')
     args = parser.parse_args()
 
     current_backbone = args.backbone
     recipe           = args.recipe
+    ablation         = args.ablation
+    hub_version      = args.hub_version
+    if hub_version == 'v2':
+        if ablation is not None:
+            raise SystemExit("--hub-version v2 is incompatible with --ablation")
+        recipe = 'baseline'
+    if ablation is not None:
+        recipe = 'baseline'
     is_custom_arch   = (current_backbone == 'custom_efficientnet_v2')
     # TTA is part of the tuned recipe only.
     is_custom        = is_custom_arch and (recipe == 'tuned')
 
-    run_name = current_backbone
-    if is_custom_arch and recipe == 'baseline':
-        run_name = f"{current_backbone}_baseline_recipe"
+    run_name = run_name_for(current_backbone, ablation, recipe, hub_version=hub_version)
 
     print(f"Backbone: {current_backbone} | Recipe: {recipe}")
     if is_custom:
@@ -160,7 +175,11 @@ def main():
 
     # Load model
     print(f"\nLoading model from {current_best_model_path}...")
-    model = MultiTaskOralClassifier(backbone=current_backbone).to(device)
+    model = MultiTaskOralClassifier(
+        backbone=current_backbone,
+        attention_branches=branches_for(ablation) if ablation is not None else None,
+        hub_version=hub_version,
+    ).to(device)
     model.load_state_dict(torch.load(current_best_model_path, map_location=device))
 
     # Evaluate

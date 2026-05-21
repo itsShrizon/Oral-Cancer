@@ -1,0 +1,29 @@
+{
+  "backbone": "custom_efficientnet_v2",
+  "recipe": "baseline",
+  "run_name": "custom_efficientnet_v2_ablation_bam_triplet",
+  "ablation": "bam_triplet",
+  "model_size_mb": 18.945,
+  "flops_raw": 492703672,
+  "flops_gflops": 0.493,
+  "num_parameters": 4789518,
+  "batch_time_ms": 41.166,
+  "estimated_epoch_time_s": 2.223,
+  "inference_time_ms_mean": 9.584,
+  "inference_time_ms_std": 0.579,
+  "gpu_peak_mb": 52.28,
+  "cpu_rss_mb": 1449.68,
+  "carbon_emission_kg_co2": 0.00020755,
+  "energy_kwh": 0.00030018,
+  "energy_source": "codecarbon",
+  "latency_distribution": {
+    "mean_ms": 10.221,
+    "std_ms": 1.586,
+    "min_ms": 9.258,
+    "max_ms": 17.361,
+    "p50_ms": 9.491,
+    "p90_ms": 12.41,
+    "p95_ms": 12.849,
+    "p99_ms": 17.075
+  }
+}

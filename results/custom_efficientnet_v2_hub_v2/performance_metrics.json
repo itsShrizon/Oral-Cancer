@@ -1,0 +1,29 @@
+{
+  "backbone": "custom_efficientnet_v2",
+  "recipe": "baseline",
+  "run_name": "custom_efficientnet_v2_hub_v2",
+  "ablation": null,
+  "model_size_mb": 18.935,
+  "flops_raw": 492657784,
+  "flops_gflops": 0.493,
+  "num_parameters": 4788931,
+  "batch_time_ms": 17.717,
+  "estimated_epoch_time_s": 0.957,
+  "inference_time_ms_mean": 9.691,
+  "inference_time_ms_std": 0.868,
+  "gpu_peak_mb": 52.27,
+  "cpu_rss_mb": 1415.55,
+  "carbon_emission_kg_co2": 0.00024907,
+  "energy_kwh": 0.00036024,
+  "energy_source": "codecarbon",
+  "latency_distribution": {
+    "mean_ms": 10.909,
+    "std_ms": 2.642,
+    "min_ms": 8.834,
+    "max_ms": 29.518,
+    "p50_ms": 9.858,
+    "p90_ms": 12.652,
+    "p95_ms": 15.497,
+    "p99_ms": 18.706
+  }
+}

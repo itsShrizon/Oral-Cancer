@@ -1,0 +1,219 @@
+\section{Discussion}\label{sec:discussion}
+
+\subsection{What the Ablation Actually Proves}\label{subsec:what_ablation_proves}
+
+The headline subtype number --- 99.51\,\% --- is the easy story. The harder
+story, and the one we believe matters more for the field, is the
+\textbf{role-complementarity principle}. The \texttt{bam\_triplet} cell and the
+independent v2-EMA negative result --- two pairings of spatial-role attention
+modules reached from disjoint module sets --- converge on the same 98.36\,\%
+subtype ceiling, each falling below the no-attention control. It is unlikely
+that two independently trained spatial-spatial configurations would land on the
+same accuracy to four significant figures by chance; the probability of such a
+convergence under a pure-noise null is low. We do not over-read two data points,
+however: the more decisive evidence is mechanistic rather than combinatorial.
+Both configurations regress \emph{beneath} the no-attention control --- an
+outcome a harmless redundant module could not produce, since an uninformative
+module would at worst leave the representation unchanged. The convergence is
+therefore better read as the signature of a systematic spatial-role conflict
+than as a coincidence, and the multi-seed follow-up of
+Section~\ref{subsec:future} is the proper remedy for the small sample. The
+contrast with \texttt{bam\_kan} --- BAM paired with the purely channel-wise KAN,
+99.15\,\% --- and with \texttt{triplet\_kan} (99.45\,\%) sharpens the point: a
+non-spatial second module is complementary, a spatial one collides.
+
+The consequence is that the present paper contributes not only a model but a
+\emph{design rule}. When attention is added to an oral-disease classifier of
+this size and on this kind of data, the modules should be paired so that they do
+not both exercise the spatial role; pairing a spatial module with a purely
+channel-wise module is complementary, whereas pairing two spatial modules
+regresses the hub below the no-attention control. When a candidate second module
+would duplicate the spatial role, the more reliable choice is to drop it. This
+reframes attention-hub design from the prevailing "stack modules and report the
+best configuration" practice into a measurement-driven procedure in which each
+component is justified against the role taxonomy of Section~\ref{sec:prelim}.
+
+\subsection{Comparison to Prior Multi-Class Systems}\label{subsec:vs_prior}
+
+MODC-SET~\cite{ref22} (Section~\ref{sec:related}), the closest seven-class
+result in the literature, reaches 99.32\,\% overall accuracy via a three-backbone
+XGBoost ensemble. The proposed model attains 99.51\,\% subtype accuracy with a
+single-stage 4.79~M parameter architecture. Because MODC-SET is evaluated on a
+different seven-class collection, this is not a controlled head-to-head
+comparison; we report it to situate the magnitude of the present result, not to
+claim a win on a shared benchmark, and the 0.19-point delta should not be read
+as a controlled accuracy advantage. The substantive contrast is methodological
+rather than numerical: MODC-SET attains its accuracy by fusing features across
+three large backbones, with no published ablation justifying which backbones to
+ensemble or why XGBoost should serve as the meta-classifier, whereas the
+accuracy of the proposed model emerges from a five-stage backbone whose only
+specialized component is justified branch by branch. The two systems thus
+demonstrate that high accuracy on seven-class oral disease data is attainable
+by very different means; the present work shows that an efficient single-model
+alternative can be reached in a principled, ablation-driven way rather than by
+ensemble scale. Accordingly, the "highest subtype accuracy" claim made
+throughout this paper is restricted to the controlled nine-baseline benchmark
+trained here under one matched recipe; it is not asserted as a record against
+the broader literature, where results obtained on different datasets and under
+different protocols are not directly comparable.
+
+Relative to the binary-screening literature~\cite{ref5,ref16,ref17}, the
+proposed model maintains binary-task parity --- 99.06\,\% against the leading
+EfficientNet~V2-B2 at 99.36\,\% --- at less than half the parameter count,
+while additionally delivering the seven-way subtype categorization that the
+binary screeners do not address. The comparison with the segmentation
+literature~\cite{ref15,ref26} is one of complementary scope rather than of
+competing numbers: those systems localize lesion extent at pixel granularity,
+whereas the present model identifies the disease class. The two questions are
+distinct, and Section~\ref{subsec:future} returns to the prospect of combining
+them.
+
+\subsection{Why the Binary Head Plateaus}\label{subsec:binary_plateau}
+
+Across the strongest baselines --- ResNet50, Inception~V3, and
+EfficientNet~V2-B2 --- the binary head sits within a narrow 99.1--99.4\,\%
+corridor. We interpret this as a property of the data rather than of the
+model: the visual gap between benign and malignant lesions is sufficiently wide
+that any reasonable backbone trained from scratch resolves it almost
+completely. Pushing the binary head past 99.5\,\% would require either a larger
+dataset that admits harder edge cases or a task-targeted augmentation strategy;
+neither is in scope here, and we do not claim a binary-task improvement.
+
+The subtype head behaves differently. It requires the model to differentiate
+among visually similar mucosal conditions --- most notably MC versus OC, two
+malignant carcinomas whose presentations overlap --- and this is exactly where
+attention-hub design has measurable leverage. The role-complementarity
+principle yields its gain on the subtype head and not on the binary head
+because the subtype task is the one whose residual errors are
+representational rather than already saturated. The plateau on the binary head
+is thus consistent with, rather than a counterexample to, the central claim of
+the paper.
+
+A clarification on the role of the dual-head construction is warranted here.
+The dual-head, multi-task design is a \emph{data-utilization} mechanism: the
+masked subtype loss is the means by which the binary-only DS1 collection can
+contribute to the same training run as the seven-class DS2 collection, rather
+than being a device claimed to raise subtype accuracy. We do not run a
+single-task control (subtype-head-only training without DS1) and therefore make
+no claim that joint multi-task training improves the subtype head over an
+equivalent single-task model. The role-complementarity gains reported in this
+paper are attributable to the AttentionHub topology, not to the multi-task
+objective; isolating the contribution of joint training is left to future work,
+and is recorded among the limitations below.
+
+\subsection{Limitations}\label{subsec:limitations}
+
+We acknowledge six limitations of the present study.
+
+\emph{(a) Single-seed evaluation.} Each model is trained once with seed~42. For
+the 0.06 percentage-point margin between AttentionHub-v2 and the best v1 cell
+(\texttt{triplet\_kan}), this margin lies within the noise band of a single
+run. We do not claim that v2 is \emph{statistically} better than
+\texttt{triplet\_kan}; we claim that v2 is the \emph{principled} design that
+the ablation forces, and that under one matched run it sets the highest subtype
+number in the study.
+
+\emph{(b) Dataset scale.} The training set is approximately 5\,500 images
+across seven subtypes --- small relative to natural-image benchmarks, though
+large relative to most oral-disease studies. We compensate through from-scratch
+training (so that no ImageNet prior is smuggled in), augmentation, early
+stopping, and replicated evaluation, but external validation on independent
+clinics is needed before clinical deployment.
+
+\emph{(c) Image-level only.} This work performs classification, not pixel-level
+segmentation. Segmentation is a complementary direction
+(Section~\ref{subsec:vs_prior}); the present model does not output lesion
+masks. Bounding-box detection and pixel masks are left as future work.
+
+\emph{(d) Training-batch timing is approximate.} The \texttt{batch\_time\_ms}
+field in \texttt{performance\_metrics.json} is estimated from test-time
+inference rather than measured during training. The latency numbers themselves
+(mean, P50, P95) are measured correctly; only the derived "estimated epoch
+time" reported alongside them is an approximation.
+
+\emph{(e) Interpretability evidence is qualitative.} Section~\ref{sec:xai}
+presents Grad-CAM++ and LIME panels and a visual alignment ranking of the
+models, but the dataset carries no lesion masks and no quantitative
+interpretability metric --- for example deletion/insertion AUC or
+pointing-game accuracy against annotated regions --- is computed. The
+cross-model interpretability ordering should therefore be read as indicative
+rather than as a measured, falsifiable result.
+
+\emph{(f) The dual-head contribution is not isolated.} As discussed in
+Section~\ref{subsec:binary_plateau}, the dual-head multi-task design is a
+data-utilization mechanism that lets the binary-only DS1 collection contribute
+to training. We do not run a subtype-only single-task control, so we do not
+isolate the effect of joint multi-task training on the subtype head; whether
+joint training improves, leaves unchanged, or mildly degrades subtype accuracy
+relative to single-task training is left to future work.
+
+\subsection{Clinical Significance and Deployment
+Considerations}\label{subsec:clinical}
+
+The 99.51\,\% subtype accuracy reported in this study is not a clinical claim.
+It is a \emph{bench-test} result on a held-out portion of a single curated
+dataset, and three distinct gaps separate it from clinical deployment.
+
+\emph{(a) Distributional gap.} The dataset's image-acquisition conditions,
+patient demographics, and intra-oral-anatomy coverage are not characterized in
+the published metadata. A deployment-grade screening system would require
+multi-site evaluation across patient populations, imaging devices, and lighting
+conditions. The proposed model's small parameter count and low inference cost
+make such an evaluation tractable on commodity hardware, but the evaluation
+itself has not been performed here.
+
+\emph{(b) Decision-context gap.} The model produces a posterior over seven
+classes; clinical decisions require additional inputs --- history, palpation,
+biopsy result --- that the model does not consume. Any deployment must
+therefore be framed as \emph{decision-support} rather than
+\emph{decision-making}, with a clinician retaining final authority over
+diagnosis and management.
+
+\emph{(c) Calibration gap.} This work reports accuracy and F1 but does not
+report calibration metrics such as Expected Calibration Error or Brier score.
+For triage-style screening --- where the most useful output is often a
+calibrated probability that the lesion warrants biopsy --- calibration becomes
+more important than accuracy. We flag this as the most consequential metric the
+present study does not report, and we treat its evaluation as an open
+follow-up.
+
+The proposed model is therefore released as a research artifact and as evidence
+for the role-complementarity principle, not as a deployable diagnostic tool.
+
+\subsection{Future Work}\label{subsec:future}
+
+Five directions follow naturally from the present study.
+
+\begin{enumerate}
+  \item \textbf{Third attention slot.} Extending the role-complementarity
+  principle to a \emph{third} attention slot would require a new ablation grid
+  testing whether a third disjoint-role module --- for example a
+  frequency-domain attention, a global-context module, or a graph-based
+  reasoning head --- compounds the gain or whether the cascade saturates at two
+  complementary modules. The principle as stated does not predict the answer.
+  \item \textbf{Backbone transferability.} The v2 hub is small enough to drop
+  into the larger EfficientNet~V2 family or into ResNet-style backbones;
+  testing whether the same principle holds when Stage~4 sits inside a deeper or
+  wider network would establish whether the rule is dataset-specific,
+  architecture-specific, or general.
+  \item \textbf{Multi-seed statistical evaluation.} A multi-seed run --- for
+  example five independent random seeds per ablation cell --- would convert the
+  present single-run table into a mean $\pm$ standard-deviation table, making
+  within-cell variability explicit and supporting paired-sample significance
+  tests between v2, \texttt{triplet\_kan}, and \texttt{full}. The principle
+  predicts that the \emph{ordering} of the cells will be preserved; an
+  empirical test of that prediction would strengthen the central methodological
+  claim.
+  \item \textbf{Hybrid classification and segmentation head.} Pairing the
+  present classifier with a lightweight segmentation head that shares Stage~5
+  features would recover the pixel-level information targeted by
+  segmentation-only papers~\cite{ref15,ref26} while retaining the
+  categorization capability targeted by classification-only
+  papers~\cite{ref19,ref22}. Stage~5's 192-channel output at $7\times7$ spatial
+  resolution is well suited to a small upsampling decoder.
+  \item \textbf{Calibration and uncertainty.} As noted in
+  Section~\ref{subsec:clinical}, calibration metrics and predictive uncertainty
+  are the most consequential evaluation axes the present study does not cover.
+  A follow-up applying temperature scaling, Monte-Carlo dropout, or deep
+  ensembling on top of the v2 model would close this gap.
+\end{enumerate}

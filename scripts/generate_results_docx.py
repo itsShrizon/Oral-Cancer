@@ -23,8 +23,20 @@ MODELS = [
     ('efficientnet_v2b3',   'EfficientNet-V2-B3'),
     ('efficientnet_v2s',    'EfficientNet-V2-S'),
     ('inception_v3',        'Inception-V3'),
-    ('custom_efficientnet_v2',                 'Custom EfficientNet V2 (tuned)'),
-    ('custom_efficientnet_v2_baseline_recipe', 'Custom EfficientNet V2 (baseline recipe)'),
+    ('custom_efficientnet_v2_baseline_recipe', 'Custom EfficientNet V2'),
+]
+
+# AttentionHub ablation runs. 'full' aliases the existing baseline_recipe folder
+# so the proposed model and the ablation table both pull from the same numbers.
+ABLATION_RUNS = [
+    ('custom_efficientnet_v2_ablation_none',         'No attention (donor Block-4)'),
+    ('custom_efficientnet_v2_ablation_bam',          'BAM only'),
+    ('custom_efficientnet_v2_ablation_triplet',      'Triplet only'),
+    ('custom_efficientnet_v2_ablation_kan',          'KAN only'),
+    ('custom_efficientnet_v2_ablation_bam_triplet',  'BAM + Triplet'),
+    ('custom_efficientnet_v2_ablation_bam_kan',      'BAM + KAN'),
+    ('custom_efficientnet_v2_ablation_triplet_kan',  'Triplet + KAN'),
+    ('custom_efficientnet_v2_baseline_recipe',       'Full hub (BAM + Triplet + KAN) — proposed'),
 ]
 
 
@@ -254,15 +266,46 @@ def main():
         doc.add_page_break()
 
     # ====================================================================
-    # 7. Notes
+    # 7. AttentionHub Ablation (Custom EfficientNet V2)
     # ====================================================================
-    doc.add_heading('7. Notes', 1)
+    avail_ablations = [(f, l) for f, l in ABLATION_RUNS
+                       if load_json(f, 'classification_metrics.json') or
+                          load_json(f, 'performance_metrics.json')]
+    if avail_ablations:
+        doc.add_heading('7. AttentionHub Ablation (Custom EfficientNet V2)', 1)
+        doc.add_paragraph(
+            "Each row uses the same fair training recipe as the 8 pretrained baselines "
+            "(lr=1e-4, no warmup/AMP/clip, ES=15, no TTA). The only thing that changes "
+            "between rows is which subset of attention branches is active at Stage 4. "
+            "The 'No attention' control replaces the AttentionHub with the donor "
+            "EfficientNetV2-B0 Block-4 (MBConv+SE) — i.e. the layer the hub replaces."
+        )
+        rows = []
+        for folder, label in avail_ablations:
+            cm = load_json(folder, 'classification_metrics.json')
+            pm = load_json(folder, 'performance_metrics.json')
+            bin_f1 = sub_f1 = 'N/A'
+            if cm:
+                bin_f1 = fmt(cm['binary']['f1_score'])
+                sub_f1 = fmt(cm['subtype']['f1_score'])
+            params = f"{pm.get('num_parameters'):,}" if pm and pm.get('num_parameters') else 'N/A'
+            gflops = f"{pm.get('flops_gflops')}" if pm and pm.get('flops_gflops') else 'N/A'
+            mb     = f"{pm.get('model_size_mb')}" if pm and pm.get('model_size_mb') else 'N/A'
+            rows.append([label, params, gflops, mb, bin_f1, sub_f1])
+        add_table(doc, ['Variant', 'Params', 'GFLOPs', 'Size (MB)',
+                        'Binary F1', 'Subtype F1'], rows)
+
+    # ====================================================================
+    # 8. Notes
+    # ====================================================================
+    doc.add_heading('8. Notes', 1)
     notes = [
-        "Custom EfficientNet V2 (tuned) uses warmup, AMP, gradient clipping, Kaiming init, "
-        "early-stopping patience=25, and Test-Time Augmentation (5 views). "
-        "Custom EfficientNet V2 (baseline recipe) uses the same training recipe as the 8 "
-        "pretrained baselines (lr=1e-4, no warmup/AMP/clip, ES=15, no TTA) — this is the "
-        "fair-comparison ablation.",
+        "Custom EfficientNet V2 uses the same training recipe as the 8 pretrained baselines "
+        "(lr=1e-4, no warmup/AMP/clip, ES=15, no TTA) for a fair comparison.",
+        "Custom EfficientNet V2 has fewer trainable parameters than EfficientNet-B0 but more "
+        "FLOPs because it drops EfficientNet-B0's late-stage conv_head/Block-6 (param-heavy, "
+        "FLOP-light at 7×7 resolution) and replaces Block-4 with an AttentionHub (BAM + Triplet "
+        "+ KAN) operating at higher spatial resolution — which is param-light but FLOP-heavy.",
         "VGG-19 folder is empty — no checkpoint was produced, so it is excluded from all "
         "tables.",
         "FLOPs are not reported because the 'thop' package is not installed. Install with "

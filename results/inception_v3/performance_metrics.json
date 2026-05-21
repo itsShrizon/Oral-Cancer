@@ -1,9 +1,9 @@
 {
   "backbone": "inception_v3",
   "model_size_mb": 91.468,
-  "flops_raw": 5675949760,
-  "flops_gflops": 5.676,
-  "num_parameters": 23888361,
+  "flops_raw": 2838028128,
+  "flops_gflops": 2.838,
+  "num_parameters": 23853929,
   "batch_time_ms": 29.035,
   "estimated_epoch_time_s": 1.568,
   "inference_time_ms_mean": 13.449,
@@ -23,5 +23,5 @@
     "p95_ms": 17.763,
     "p99_ms": 18.054
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }

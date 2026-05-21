@@ -1,0 +1,165 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./main.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-04-29>
+(./IEEEtran.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+-- Using 210mm x 297mm (a4) paper.
+-- Using PDF output.
+-- This is a 10 point document.
+) (c:/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
+(c:/texlive/2025/texmf-dist/tex/latex/graphics/keyval.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/graphics/graphics.sty
+(c:/texlive/2025/texmf-dist/tex/latex/graphics/trig.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(c:/texlive/2025/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(c:/texlive/2025/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(c:/texlive/2025/texmf-dist/tex/latex/amsmath/amstext.sty
+(c:/texlive/2025/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(c:/texlive/2025/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(c:/texlive/2025/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(c:/texlive/2025/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(c:/texlive/2025/texmf-dist/tex/latex/tools/array.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/tools/dcolumn.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/hyperref/hyperref.sty
+(c:/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(c:/texlive/2025/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(c:/texlive/2025/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(c:/texlive/2025/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/hyperref/nameref.sty
+(c:/texlive/2025/texmf-dist/tex/latex/refcount/refcount.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(c:/texlive/2025/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(c:/texlive/2025/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(c:/texlive/2025/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(c:/texlive/2025/texmf-dist/tex/latex/hyperref/puenc.def)
+(c:/texlive/2025/texmf-dist/tex/latex/url/url.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
+(c:/texlive/2025/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(c:/texlive/2025/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(c:/texlive/2025/texmf-dist/tex/latex/hyperref/hpdftex.def
+(c:/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(c:/texlive/2025/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(c:/texlive/2025/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(c:/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./main.aux)
+-- Lines per column: 58 (exact).
+(c:/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (c:/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(c:/texlive/2025/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(./main.out) (./main.out)
+(c:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(c:/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(./sections/00_abstract.tex)
+Underfull \hbox (badness 2285) in paragraph at lines 52--54
+\OT1/cmr/bx/n/9 has ma-tured along two nar-row tracks --- bi-nary
+(./sections/01_introduction.tex
+
+[1{c:/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Underfull \hbox (badness 1783) in paragraph at lines 49--54
+[]\OT1/cmr/m/n/10 We de-sign \OT1/cmr/bx/n/10 Cus-tom Ef-fi-cient-Net V2\OT1/cm
+r/m/n/10 , a five-
+
+Underfull \hbox (badness 2096) in paragraph at lines 49--54
+\OT1/cmr/m/n/10 stage parameter-efficient back-bone de-rived from
+(c:/texlive/2025/texmf-dist/tex/latex/base/omscmr.fd)
+Underfull \hbox (badness 10000) in paragraph at lines 59--64
+[]\OT1/cmr/m/n/10 Guided by the prin-ci-ple, we in-tro-duce
+
+Underfull \hbox (badness 10000) in paragraph at lines 59--64
+\OT1/cmr/bx/n/10 AttentionHub-v2\OT1/cmr/m/n/10 , a se-quen-tial Triplet$\OMS/c
+msy/m/n/10 !$\OT1/cmr/m/n/10 SE
+
+Underfull \hbox (badness 10000) in paragraph at lines 59--64
+\OT1/cmr/m/n/10 AttentionHub-v2 at-tains the high-est sub-type
+
+Underfull \hbox (badness 3189) in paragraph at lines 59--64
+\OT1/cmr/m/n/10 ac-cu-racy in the en-tire study ($99\OML/cmm/m/it/10 :\OT1/cmr/
+m/n/10 51 %$) at no
+
+LaTeX Warning: Reference `fig:arch' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Reference `sec:methods' on page 2 undefined on input line 83.
+
+
+LaTeX Warning: Reference `sec:setup' on page 2 undefined on input line 86.
+
+
+LaTeX Warning: Reference `sec:results' on page 2 undefined on input line 88.
+
+
+LaTeX Warning: Reference `sec:ablation' on page 2 undefined on input line 89.
+
+
+LaTeX Warning: Reference `sec:xai' on page 2 undefined on input line 90.
+
+
+LaTeX Warning: Reference `sec:discussion' on page 2 undefined on input line 91.
+
+
+
+LaTeX Warning: Reference `sec:conclusion' on page 2 undefined on input line 93.
+
+
+) (./sections/02_related_work.tex
+
+[2]
+
+[3]) (./sections/03_preliminaries.tex
+
+LaTeX Warning: Reference `sec:methods' on page 4 undefined on input line 24.
+
+
+LaTeX Warning: Reference `sec:ablation' on page 4 undefined on input line 52.
+
+) (./sections/04_methods.tex
+) (./sections/05_experimental_setup.tex) (./sections/06_baseline_results.tex)
+(./sections/07_ablation.tex) (./sections/08_explainability.tex)
+(./sections/09_discussion.tex) (./sections/10_conclusion.tex)
+(./sections/11_backmatter.tex) (./main.bbl
+[4]
+Underfull \hbox (badness 2020) in paragraph at lines 102--106
+[]\OT1/cmr/m/n/8 A. Abou-Bakr, A. El Bar-bary, and F. E. A. Has-sanein,
+)
+
+[5] (./main.aux)
+
+LaTeX Warning: There were undefined references.
+
+ )
+(see the transcript file for additional information) <c:/Users/Shrizon/.texlive
+2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm0800.600pk><c:/texlive/2025/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2025/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmbx9.pfb><c:/texlive/2025/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmbxti10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmcsc10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7
+.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><c:/t
+exlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/202
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2025/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2025/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmr9.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmsy10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pf
+b><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb><c:/texl
+ive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2025/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb><c:/texlive/2025/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2025/texmf-dist/fonts/typ
+e1/public/amsfonts/symbols/msbm10.pfb>
+Output written on main.pdf (5 pages, 272676 bytes).
+Transcript written on main.log.

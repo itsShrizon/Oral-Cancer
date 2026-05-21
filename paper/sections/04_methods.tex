@@ -1,0 +1,447 @@
+\section{Materials and Methods}\label{sec:methods}
+
+This section specifies the experimental data, the dual-head classifier
+shared by every architecture in the study, the proposed Custom EfficientNet
+V2 backbone, the two AttentionHub variants, the masked multi-task loss, and
+the training, evaluation, and ablation protocols. Throughout, the design is
+governed by a single principle: every architectural choice that is not
+inherited verbatim from a published reference is later subjected to a
+controlled measurement, so that the proposed model is the conclusion of an
+ablation rather than an unverified assertion.
+
+\subsection{Dataset}\label{ssec:dataset}
+
+The experimental data combine two complementary sources that together
+support the dual-task formulation. \emph{Dataset~1} (DS1) provides binary
+supervision: a curated collection of oral lesion photographs labelled as
+benign or malignant, used to drive the binary head of the classifier.
+\emph{Dataset~2} (DS2) provides seven-way subtype supervision across the
+seven classes \textbf{CaS}, \textbf{CoS}, \textbf{Gum}, \textbf{MC},
+\textbf{OC}, \textbf{OLP}, and \textbf{OT}, as labelled in the source
+dataset; we retain the dataset's class abbreviations verbatim rather than
+assigning clinical expansions that the source release does not document.
+Within DS2, the subset $\{\text{MC},\text{OC},\text{CaS}\}$ is taken to
+denote the malignant subtypes, and the remaining four classes the
+non-malignant subtypes, for the purpose of constructing binary supervision
+when DS2 images are read into the binary head. Representative images for the two binary categories
+and the seven subtype classes are shown in Fig.~\ref{fig:dataset}; the
+visual overlap in colour, texture, and boundary cues across several
+subtypes motivates the multi-class formulation pursued here.
+
+The original DS2 release exhibited a distributional similarity between its
+provided \emph{Training} and \emph{Testing} folders that would inflate
+test-set scores by leaking near-duplicate appearance statistics across the
+split. To eliminate this confound, the DS2 \emph{Training} and
+\emph{Validation} directories are merged and re-partitioned with a
+stratified 60/20/20 train/validation/test split, seeded for reproducibility
+(seed${}={}$42). DS1 is partitioned independently with a stratified
+80/10/10 split. The resulting test set contains 1\,646 DS2 images
+distributed across the seven subtype classes, with the following per-class
+supports: CaS${}={}$256, CoS${}={}$239, Gum${}={}$192, MC${}={}$288,
+OC${}={}$173, OLP${}={}$288, and OT${}={}$210. The full per-class
+distribution across the merged train, validation, and test partitions is
+plotted in Fig.~\ref{fig:classdist}.
+
+All images are resized to $224 \times 224$ and normalised with ImageNet
+channel statistics. Training augmentation comprises random horizontal and
+vertical flips, random rotation up to $\pm 15^{\circ}$, a random crop taken
+after resizing to $256 \times 256$, and colour jitter (brightness,
+contrast, and saturation each $\pm 0.2$; hue $\pm 0.1$). The validation and
+test sets receive no augmentation. The test set is held out in its entirety
+and consulted only for final reporting, so that no design decision in this
+paper is informed by test-set performance.
+
+\begin{figure*}[tbp]
+  \centering
+  \includegraphics[width=\textwidth,height=0.92\textheight,%
+  keepaspectratio]{fig02_dataset_sample_grid}
+  \caption{Representative images from the two datasets, arranged as a
+  9-row by 4-column grid: one class per row, with four randomly sampled
+  examples per class shown across the four columns (seed${}={}$42). The top
+  two rows show the DS1 binary categories (benign, malignant); the lower
+  seven rows show the DS2 subtype classes CaS, CoS, Gum, MC, OC, OLP, and
+  OT. Several subtypes share overlapping colour, texture, and boundary
+  appearance, which is the visual difficulty that the seven-class head must
+  resolve.}
+  \label{fig:dataset}
+\end{figure*}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig02b_class_distribution}
+  \caption{Class distribution across the two datasets. \emph{Left:} DS1
+  benign-versus-malignant image counts. \emph{Right:} for each DS2 subtype,
+  the total number of images across the merged train, validation, and test
+  partitions, alongside the held-out test-set support used for per-class
+  reporting in Section~\ref{sec:results}.}
+  \label{fig:classdist}
+\end{figure}
+
+\subsection{Dual-Head Multi-Task Classifier}\label{ssec:dualhead}
+
+All ten architectures evaluated in this study --- nine baseline backbones
+and the proposed model --- share a common dual-head wrapper, denoted
+\texttt{MultiTaskOralClassifier}. A shared backbone produces a pooled
+feature vector, after which two independent multilayer perceptron (MLP)
+heads predict the binary class (2 logits) and the subtype class (7 logits).
+Each head is a \texttt{Linear}$(F\!\rightarrow\!512)\rightarrow
+\text{ReLU}\rightarrow\text{Dropout}\rightarrow
+\texttt{Linear}(512\!\rightarrow\!C)$ stack, where $F$ is the
+backbone feature dimensionality and $C$ is the head's class count. A shared
+dropout layer with rate $p=0.5$ is applied to the pooled features before
+either head, providing the principal regularisation against over-fitting on
+a dataset of modest scale.
+
+The dual-head construction is what allows DS1, which carries only binary
+labels, and DS2, which carries both binary and subtype labels, to train a
+single model jointly: the subtype loss is masked for samples that lack a
+subtype label, as detailed in Section~\ref{ssec:loss}. Sharing the backbone
+across both tasks also forces the learned representation to be useful for
+benign-versus-malignant screening and for fine-grained subtype
+discrimination simultaneously, rather than specialising to either task in
+isolation.
+
+\subsection{Custom EfficientNet V2 Backbone}\label{ssec:backbone}
+
+The proposed backbone is a five-stage CNN derived from the
+\texttt{tf\_efficientnetv2\_b0} reference, the smallest member of the
+EfficientNetV2 family~\cite{tan2021effv2}. Two structural
+changes are applied to the donor architecture, and only these two; every
+other stage is retained verbatim from the EfficientNetV2-B0 reference so
+that the contribution of each change can be measured cleanly.
+
+\begin{enumerate}
+  \item \textbf{Stage-4 replacement.} The donor's Block-4 --- a Mobile
+  Inverted Bottleneck Convolution (MBConv) block fused with a
+  Squeeze-and-Excitation (SE) unit, mapping $96 \rightarrow 112$ channels
+  --- is removed and replaced by an \emph{AttentionHub}
+  (Section~\ref{ssec:hub}) with identical input and output channel counts.
+  The hub is the only stage whose internal structure departs from the
+  EfficientNetV2-B0 reference, and it is the only component the ablation of
+  Section~\ref{sec:ablation} varies.
+  \item \textbf{Tail trimming.} The donor's Block-6 and its
+  \texttt{conv\_head} are dropped as redundant for this task. The
+  192-channel output of Stage~5 is pooled directly into the dual-head
+  classifier, which removes a substantial parameter and compute cost
+  carried by the donor's wide convolutional head.
+\end{enumerate}
+
+The resulting backbone comprises five stages --- \emph{Stem${}+{}$Block-0
+${}+{}$Block-1} (32 channels) $\rightarrow$ \emph{Block-2} (48)
+$\rightarrow$ \emph{Block-3} (96) $\rightarrow$ \emph{AttentionHub} (112)
+$\rightarrow$ \emph{Block-5} (192) --- followed by global average pooling
+and the two heads. The complete model contains between 4.79~M and 4.80~M
+parameters and requires between 0.493 and 0.495 GFLOPs across the
+attention-bearing ablation variants reported in Section~\ref{sec:ablation};
+the no-attention control, which restores the donor's heavier
+MBConv${}+{}$SE Block-4, is the exception at 5.70~M parameters and 0.636
+GFLOPs (Table~\ref{tab:ablation}). The proposed configuration sits at the
+lower end of the attention-bearing range (4.79~M parameters, 0.493 GFLOPs).
+The full backbone, the Stage-4 hub, the global average pooling stage, and
+the dual-head split are diagrammed in Fig.~\ref{fig:arch}.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig01_custom_efficientnet_v2_arch}
+  \caption{The proposed Custom EfficientNet V2. A five-stage backbone
+  derived from EfficientNetV2-B0 feeds a global average pooling layer and a
+  shared dropout, after which two independent MLP heads predict the binary
+  (benign / malignant) and subtype (7-class) labels. Stage~4 is replaced by
+  the proposed AttentionHub-v2, a sequential Triplet$\rightarrow$SE cascade
+  flanked by $1\times1$ channel-reduction and channel-expansion
+  projections; the donor's Block-6 and convolutional head are removed. The
+  complete model has 4.79~M parameters and 0.493 GFLOPs.}
+  \label{fig:arch}
+\end{figure*}
+
+\subsection{AttentionHub Variants}\label{ssec:hub}
+
+The AttentionHub is the single module whose composition changes across
+ablation cells and across the two versions of the design presented here.
+Both versions occupy Stage~4 of the backbone and preserve the
+$96 \rightarrow 112$ channel mapping of the block they replace.
+
+\paragraph{AttentionHub-v1 (parallel triple)}
+The originally proposed hub routes the Stage-3 output through three parallel
+attention branches --- Bottleneck Attention Module (BAM), Triplet Attention,
+and Kolmogorov--Arnold Network attention (KAN-Attention) --- each preceded
+by a $1\times1$ channel-reduction projection that halves the branch channel
+count. The three branch outputs are concatenated and fused by a $1\times1$
+projection back to 112 channels. Ablation of v1 is implemented by removing
+branches: the empty configuration restores the donor's original Block-4
+(the canonical no-attention control), and any subset of
+$\{\text{BAM},\text{Triplet},\text{KAN}\}$ is admissible. The three
+candidate modules, whose internal structure is shown in
+Fig.~\ref{fig:modules}, are as follows.
+
+\begin{itemize}
+  \item \textbf{BAM}~\cite{park2018bam} combines a channel gate (global
+  average pooling followed by an MLP bottleneck) and a spatial gate
+  ($1\times1 \rightarrow$ dilated $3\times3 \rightarrow 1\times1$, producing
+  a single-channel spatial map). The two gates are summed, passed through a
+  sigmoid, and multiplied with the input. BAM therefore exercises
+  \emph{both} a channel and a spatial role.
+  \item \textbf{Triplet Attention}~\cite{misra2021triplet} uses three
+  branches, each applying a $7\times7$ attention gate to a permutation of
+  the input tensor: the first branch swaps the channel and height axes, the
+  second swaps the channel and width axes, and the third leaves the input
+  in its native $(B,C,H,W)$ layout. Each gate applies a Z-Pool, which
+  concatenates max- and mean-pooled statistics across the gated axis into
+  two channels, followed by a $7\times7$ convolution and a sigmoid. The
+  three branch outputs are averaged. Triplet exercises a
+  \emph{cross-dimensional spatial} role at near-zero additional parameter
+  cost.
+  \item \textbf{KAN-Attention} is a Kolmogorov--Arnold-Network-inspired
+  channel recalibration~\cite{liu2024kan}. Global average pooling produces
+  a per-channel scalar; each scalar is passed through a learnable B-spline
+  basis expansion (five Gaussian basis functions on $[-3,+3]$) with a SiLU
+  residual, then sigmoid-gated and multiplied with the input. KAN-Attention
+  is \emph{purely channel-wise} and supplies a non-linear alternative to the
+  linear MLP used in the SE and BAM channel gates.
+\end{itemize}
+
+\paragraph{AttentionHub-v2 (sequential Triplet$\rightarrow$SE)}
+The proposed model uses a sequential cascade in which the channel-reduced
+feature is first refined by Triplet Attention and then by
+Squeeze-and-Excitation (SE)~\cite{hu2018se}. The SE module pools globally,
+passes the pooled descriptor through a two-layer $1\times1$ bottleneck with
+reduction ratio 16 and a sigmoid gate, and multiplies the result back into
+the input. No LayerScale, no per-module residual, and no additional gating
+are introduced: both attentions are multiplicative gates that preserve the
+input information without an explicit skip connection. The composition
+order --- spatial attention before channel attention --- follows the
+convention established by the Convolutional Block Attention Module
+(CBAM)~\cite{woo2018cbam}. The internal layout of the v2 hub is shown in
+Fig.~\ref{fig:hubv2}, and a side-by-side contrast with the v1 parallel hub
+is given in Fig.~\ref{fig:v1v2}. The design rationale for v2 --- in
+particular, why a sequential cascade is preferred over the v1 parallel
+fusion and why SE is chosen as the channel partner --- is not asserted here
+but \emph{derived} in Section~\ref{sec:ablation} from the v1 ablation.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig01d_attention_modules_internals}
+  \caption{Internal structure of the four attention modules used in this
+  study. \emph{Triplet Attention} applies a $7\times7$ gate to three
+  axis-permuted views of the feature map and averages them, exercising a
+  cross-dimensional spatial role. \emph{Squeeze-and-Excitation (SE)}
+  recalibrates channels through a global-average-pooling bottleneck.
+  \emph{BAM} sums a channel gate and a spatial gate, exercising a mixed
+  role. \emph{KAN-Attention} replaces the linear channel MLP with a
+  learnable B-spline basis expansion, remaining purely channel-wise.}
+  \label{fig:modules}
+\end{figure*}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig01b_attentionhub_v2_detail}
+  \caption{The proposed AttentionHub-v2. A $1\times1$ projection reduces the
+  96-channel Stage-3 feature; Triplet Attention then applies
+  cross-dimensional spatial gating, SE applies pure per-channel
+  recalibration, and a $1\times1$ projection expands the result to 112
+  channels for Stage~5. The two attention modules occupy disjoint functional
+  roles --- spatial and channel --- which Section~\ref{sec:ablation} shows is
+  the condition required to avoid the observed sub-baseline accuracy
+  ceiling.}
+  \label{fig:hubv2}
+\end{figure}
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig01c_attentionhub_v1_vs_v2}
+  \caption{AttentionHub-v1 versus AttentionHub-v2. \emph{Left:} the v1 hub
+  fuses BAM, Triplet, and KAN-Attention in parallel, concatenating their
+  channel-reduced branch outputs before a $1\times1$ projection.
+  \emph{Right:} the proposed v2 hub composes Triplet Attention and SE
+  sequentially. The two hubs reuse the same building blocks but differ in
+  composition; Section~\ref{sec:ablation} shows that the difference in
+  composition is what separates their accuracy.}
+  \label{fig:v1v2}
+\end{figure*}
+
+\subsection{Multi-Task Loss}\label{ssec:loss}
+
+The two heads are trained jointly under a single combined cross-entropy
+(CE) objective,
+
+\begin{equation}\label{eq:loss}
+  \begin{split}
+  \mathcal{L} \;=\;{}& w_b \cdot \mathrm{CE}\!\left(p_{\text{binary}},\,
+  y_{\text{binary}}\right) \\
+  &{}+\; w_s \cdot \mathrm{CE}\!\left(
+  p_{\text{subtype}},\, y_{\text{subtype}};\,
+  \texttt{ignore\_index}=-1\right),
+  \end{split}
+\end{equation}
+
+with equal task weights $w_b = w_s = 1$. The \texttt{ignore\_index}${}={}-1$
+convention is the mechanism that lets the two datasets co-train against one
+model: DS1 samples, which carry no subtype label, are assigned the sentinel
+subtype label $-1$ and therefore contribute only to the binary term, while
+DS2 samples contribute to both terms. A numerical guard converts any
+not-a-number (NaN) subtype loss to zero, so that a mini-batch composed
+exclusively of DS1 samples --- for which the subtype term is undefined ---
+remains a valid training step.
+
+The joint update is summarised in Algorithm~1, typeset in
+Fig.~\ref{alg:train}. The masked subtype loss is the only coupling between
+the binary-only DS1 and the dually labelled DS2: DS1 samples shape the
+shared backbone solely through $\mathcal{L}_b$, whereas DS2 samples shape it
+through both $\mathcal{L}_b$ and $\mathcal{L}_s$.
+
+\begin{figure}[!t]
+  \centering
+  \fbox{%
+  \begin{minipage}{0.92\columnwidth}
+  \ttfamily \footnotesize
+  \textbf{Algorithm 1:} Joint masked multi-task training step.\\[2pt]
+  \textbf{Input:} mini-batch $(x, y_b, y_s)$; model $M = $ backbone\\
+  \hphantom{\textbf{Input:} }${}+ (g_{\text{binary}}, g_{\text{subtype}})$;
+  optimizer Opt;\\
+  \hphantom{\textbf{Input:} }loss weights $(w_b, w_s)$.\\
+  \textbf{Output:} updated model parameters.\\[3pt]
+  1.\ \ $F \leftarrow$ backbone$(x)$ \hfill \# $B \times D$\\
+  2.\ \ $F \leftarrow$ Dropout$(F,\ p = 0.5)$\\
+  3.\ \ $\hat{y}_b \leftarrow g_{\text{binary}}(F)$ \hfill \# $B \times 2$\\
+  4.\ \ $\hat{y}_s \leftarrow g_{\text{subtype}}(F)$ \hfill \# $B \times 7$\\
+  5.\ \ $L_b \leftarrow$ CE$(\hat{y}_b,\ y_b)$ \hfill \# always defined\\
+  6.\ \ $L_s \leftarrow$ CE$(\hat{y}_s,\ y_s;$ ignore\_index $= -1)$\\
+  \hphantom{6.\ \ }\hfill \# NaN if every $y_s = -1$\\
+  7.\ \ \textbf{if} isnan$(L_s)$\textbf{:}\ \ $L_s \leftarrow 0$
+  \hfill \# DS1-only batch guard\\
+  8.\ \ $L_{\text{total}} \leftarrow w_b \cdot L_b + w_s \cdot L_s$\\
+  9.\ \ Opt.zero\_grad()\textbf{;}\ \ $L_{\text{total}}$.backward()%
+  \textbf{;}\ \ Opt.step()
+  \end{minipage}}
+  \caption{Joint training step under the masked multi-task loss. The
+  sentinel subtype label $-1$ marks DS1 (binary-only) samples; the
+  \texttt{ignore\_index} convention and the NaN guard on line~7 together
+  allow DS1 and DS2 to co-train a single shared backbone.}
+  \label{alg:train}
+\end{figure}
+
+\subsection{Training Protocol}\label{ssec:training}
+
+All ten models --- the nine baseline backbones and the proposed model ---
+are trained from scratch under a single matched recipe, deliberately chosen
+to guarantee a fair comparison. \textbf{No ImageNet pre-trained weights are
+used.} Pre-training would smuggle a representational prior into the
+comparison and confound the contribution of the dataset itself with the
+contribution of the architecture; training every model from random
+initialisation removes that confound and isolates what each backbone learns
+from the oral-disease data alone. The recipe is fixed as follows.
+
+\begin{itemize}
+  \item \textbf{Optimiser:} Adam~\cite{kingma2015adam}, learning rate
+  $1\times10^{-4}$, weight decay $1\times10^{-4}$.
+  \item \textbf{Scheduler:} cosine annealing over the full epoch budget.
+  \item \textbf{Batch size:} 64, with gradient accumulation factor 1
+  (effective batch size 64).
+  \item \textbf{Epoch budget:} 200, with early stopping (patience 15,
+  minimum improvement $\Delta = 1\times10^{-4}$ on validation loss).
+  \item \textbf{Seed:} 42, with deterministic CuDNN.
+  \item \textbf{Image size:} $224\times224$.
+  \item \textbf{Hardware:} a single NVIDIA GeForce RTX~4060~Ti.
+\end{itemize}
+
+This recipe is enforced for every model without exception. In particular,
+the AttentionHub ablation variants are forced onto the identical baseline
+recipe, so that v1, v2, and the seven ablation cells of
+Section~\ref{sec:ablation} are directly comparable. Per-model
+hyper-parameter tuning is deliberately \emph{not} performed: tuning would
+advantage the models we elect to tune and disadvantage those we do not,
+reintroducing exactly the kind of uncontrolled variable that a fair
+benchmark must eliminate. Where a baseline encounters memory pressure on the
+16~GB GPU, the correct response under this protocol is gradient
+accumulation at a fixed effective batch size, not a per-model
+hyper-parameter override --- a stance established by prior fair-comparison
+work and retained here as a methodological commitment rather than a
+convenience.
+
+\subsection{Evaluation Protocol}\label{ssec:evaluation}
+
+For every model we report the following quantities on the held-out test
+set.
+
+\begin{itemize}
+  \item \textbf{Classification metrics:} accuracy, weighted precision,
+  weighted recall, and weighted F1, for both the binary head (the DS1 test
+  split together with the full DS2 test set, $1\,711$ images in total) and the
+  subtype head (the DS2 seven-class test set, $1\,646$ images).
+  \item \textbf{Per-class report:} precision, recall, F1, and support for
+  each of the seven subtype classes.
+  \item \textbf{Confusion matrices:} the binary and subtype confusion
+  matrices, reported side by side.
+  \item \textbf{Computational metrics:} parameter count, GFLOPs computed
+  with \texttt{thop}, on-disk model size in megabytes, GPU peak memory
+  during inference,\footnote{Compute is reported as the multiply-accumulate
+  (MAC) count returned by the \texttt{thop} profiler, following common
+  practice; we use the label GFLOPs for these MAC-count values for
+  consistency with the comparison literature.} the mean and standard
+  deviation of single-image
+  inference latency (a 200-iteration warm-up followed by 1\,000 timed
+  iterations), the P50 / P90 / P95 / P99 latency percentiles --- of which
+  the P50 and P95 values are tabulated in Section~\ref{sec:results} ---
+  energy in kWh and carbon in kg~CO\textsubscript{2}-equivalent measured
+  with \texttt{codecarbon} where available, total training time, and the
+  number of epochs completed before early stopping.
+  \item \textbf{Explainability artifacts:} for each model, a
+  Gradient-weighted Class Activation Mapping++ (Grad-CAM++) panel and a Local
+  Interpretable Model-Agnostic Explanations (LIME) boundary-mask panel for
+  the binary head, and the matching pair for the subtype head, evaluated on
+  a class-balanced sample of test images.
+\end{itemize}
+
+The per-model JSON metric files, training-time logs, latency histograms,
+confusion matrices, and explainability images are released alongside the
+paper so that every reported number can be independently regenerated.
+
+\subsection{Ablation Protocol}\label{ssec:ablation_protocol}
+
+The AttentionHub-v1 ablation is implemented as a code-level branch switch:
+each ablation key maps to a tuple of active branches, a subset of
+$\{\text{bam},\text{triplet},\text{kan}\}$, where the empty tuple falls
+back to the donor's original Block-4 and thus serves as the no-attention
+control. Because the switch operates inside the hub and changes nothing
+else in the network or the recipe, the eight cells differ from one another
+only in which attention branches are active --- the property required for
+the ablation to be causally interpretable. The eight cells are listed in
+Table~\ref{tab:ablkeys}, together with the functional role each
+configuration's hub exercises.
+
+\begin{table}[!t]
+  \centering
+  \caption{AttentionHub-v1 ablation keys. Each key activates a subset of the
+  three candidate branches; the empty configuration restores the donor
+  MBConv${}+{}$SE Block-4 as the no-attention control. The role column
+  classifies the configuration by the functional role its hub exercises and
+  is the basis of the role-complementarity analysis in
+  Section~\ref{sec:ablation}.}
+  \label{tab:ablkeys}
+  \begin{tabularx}{\columnwidth}{@{}l l X@{}}
+    \hline
+    Key & Active branches & Functional role \\
+    \hline
+    \texttt{none} & --- (donor MBConv${}+{}$SE) & no-attention control \\
+    \texttt{bam} & BAM & spatial${}+{}$channel singleton \\
+    \texttt{triplet} & Triplet & cross-dim-spatial singleton \\
+    \texttt{kan} & KAN & channel singleton \\
+    \texttt{bam\_triplet} & BAM${}+{}$Triplet & two-spatial-role pair \\
+    \texttt{bam\_kan} & BAM${}+{}$KAN & mixed-role pair \\
+    \texttt{triplet\_kan} & Triplet${}+{}$KAN &
+      cross-dim-spatial${}+{}$pure-channel pair \\
+    \texttt{full} (${}={}$v1) & BAM${}+{}$Triplet${}+{}$KAN &
+      original proposed model \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+In addition, we report a v2-EMA run --- a sequential Triplet${}+{}$Efficient
+Multi-scale Attention (EMA) cascade --- which is \emph{not} an ablation cell
+but a deliberate stress test of the role-complementarity principle: it
+replaces SE with EMA, a module that combines a multi-scale spatial branch
+with a channel branch. Because EMA exercises a spatial role, the principle
+predicts that the v2-EMA cascade should regress, and the result reported in
+Section~\ref{sec:ablation} confirms this prediction. Every ablation cell is
+trained under the identical baseline recipe used by the nine baseline
+backbones; no recipe exceptions apply.

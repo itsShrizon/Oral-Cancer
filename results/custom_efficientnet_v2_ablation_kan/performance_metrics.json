@@ -1,0 +1,29 @@
+{
+  "backbone": "custom_efficientnet_v2",
+  "recipe": "baseline",
+  "run_name": "custom_efficientnet_v2_ablation_kan",
+  "ablation": "kan",
+  "model_size_mb": 18.884,
+  "flops_raw": 490358512,
+  "flops_gflops": 0.49,
+  "num_parameters": 4777297,
+  "batch_time_ms": 26.522,
+  "estimated_epoch_time_s": 1.432,
+  "inference_time_ms_mean": 8.735,
+  "inference_time_ms_std": 1.529,
+  "gpu_peak_mb": 52.21,
+  "cpu_rss_mb": 1486.09,
+  "carbon_emission_kg_co2": 0.00020266,
+  "energy_kwh": 0.00029311,
+  "energy_source": "codecarbon",
+  "latency_distribution": {
+    "mean_ms": 8.241,
+    "std_ms": 0.4,
+    "min_ms": 7.973,
+    "max_ms": 13.664,
+    "p50_ms": 8.188,
+    "p90_ms": 8.307,
+    "p95_ms": 8.374,
+    "p99_ms": 8.813
+  }
+}

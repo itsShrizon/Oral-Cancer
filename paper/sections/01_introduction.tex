@@ -1,0 +1,96 @@
+\section{Introduction}\label{sec:intro}
+
+\IEEEPARstart{O}{ral} diseases --- including ulcerative, inflammatory, and
+neoplastic lesions --- present a complex visual challenge for automated
+analysis. Conditions such as recurrent aphthous ulcer, oral lichen planus, and
+squamous-cell carcinoma can share overlapping colour, texture, and boundary
+cues at the image level, yet a single misclassification between a benign
+inflammatory lesion and an early malignancy carries materially different
+clinical consequences. A computer-aided diagnostic system must therefore solve
+two related but distinct problems: identifying \emph{whether} a lesion is
+malignant --- binary screening --- and identifying \emph{which} of several
+visually similar conditions is present --- multi-class subtyping. The second
+problem is the one that most directly governs the choice of downstream
+management pathway, and it is the focus of this paper.
+
+Deep learning has matured rapidly in this domain. CNNs and, more recently,
+Vision Transformers have produced strong binary screening
+results~\cite{ref5,ref16,ref17} and several promising multi-class
+systems~\cite{ref19,ref22}. Despite this progress, three persistent gaps remain
+in the literature.
+
+\emph{Gap~1 --- Binary formulations dominate.} Most published architectures
+collapse oral pathology to a benign-versus-malignant decision. This formulation
+is clinically insufficient when downstream treatment depends on differentiating
+among multiple non-malignant conditions that visually mimic malignancy, since
+ulcerative, inflammatory, and neoplastic lesions warrant different management
+pathways.
+
+\emph{Gap~2 --- Attention modules are stacked without ablation.} Modern
+backbones routinely embed attention components --- Squeeze-and-Excitation
+(SE), the Convolutional Block Attention Module (CBAM), the Bottleneck Attention
+Module (BAM), Triplet Attention, Efficient Multi-scale Attention (EMA), and
+Kolmogorov-Arnold Network attention (KAN) --- yet their individual and combined
+contributions in the oral-disease setting are rarely measured. The literature
+offers little guidance on which attention modules complement one another and
+which conflict, and proposed architectures tend to inherit attention designs
+from generic benchmarks rather than testing them on the target distribution.
+
+\emph{Gap~3 --- Explainability evidence is sparse.} Few multi-class oral
+disease studies present visual attention maps that demonstrate the model
+attends to lesion tissue rather than to teeth, lip outlines, or lighting
+artifacts. Absent such evidence, it is difficult to argue that a high-accuracy
+model is also clinically defensible.
+
+The present work addresses these three gaps directly. We make the following
+four contributions.
+
+\begin{enumerate}
+  \item We design \textbf{Custom EfficientNet~V2}, a five-stage
+  parameter-efficient backbone derived from EfficientNetV2-B0 in which the
+  standard Block-4 is replaced by a domain-tuned \emph{AttentionHub} and the
+  redundant Block-6 and convolutional head are removed, yielding a
+  $4.79$~M-parameter, $0.493$~GFLOPs model.
+  \item We perform a systematic \textbf{seven-cell ablation} of the
+  AttentionHub spanning the \{BAM, Triplet, KAN\} singletons, all pairs, and
+  the full triple, plus a no-attention control. From this ablation we derive a
+  \textbf{role-complementarity principle}: pairing two spatial-role attention
+  modules regresses the hub below its no-attention control, whereas pairing a
+  spatial module with a purely channel-wise one is complementary. The principle
+  is supported by the v1 ablation grid and an independent negative-result run.
+  \item Guided by the principle, we introduce \textbf{AttentionHub-v2}, a
+  sequential Triplet\arrowto{}SE cascade in which spatial cross-dimensional
+  attention is followed by purely channel-wise recalibration.
+  AttentionHub-v2 attains the highest subtype accuracy in the entire study
+  ($99.51\,\%$) at a parameter and compute budget ($4.79$~M / $0.493$~GFLOPs)
+  essentially identical to the v1 hub and well below every baseline.
+  \item We benchmark the proposed model against nine standard backbones under
+  a \textbf{single matched training recipe}, with all models trained from
+  scratch (no ImageNet pre-training), and provide Grad-CAM++ and LIME
+  explainability panels for every model. The full ablation results and
+  explainability artifacts are released alongside the paper.
+\end{enumerate}
+
+Figure~\ref{fig:arch} previews the proposed architecture: a five-stage backbone
+whose fourth stage is the AttentionHub and whose pooled feature feeds two
+task-specific heads, one for the binary task and one for the seven-class
+subtype task. The architectural changes are deliberately minimal --- a single
+swapped stage and a trimmed tail --- so that the measured gains can be
+attributed to the hub design rather than to a wholesale redesign of the
+network.
+
+The remainder of this paper is organised as follows.
+Section~\ref{sec:related} reviews prior work on oral lesion classification and
+segmentation, makes the three motivating gaps explicit, and positions the
+present study. Section~\ref{sec:prelim} fixes the notation and the attention
+role taxonomy on which the ablation rests. Section~\ref{sec:methods} describes
+the dataset, the dual-head classifier, the Custom EfficientNet~V2 backbone, the
+two AttentionHub variants, the multi-task loss, and the matched training
+protocol. Section~\ref{sec:setup} specifies the experimental setup,
+reproducibility provisions, and ethical considerations.
+Section~\ref{sec:results} reports the baseline benchmark and per-class
+results. Section~\ref{sec:ablation} presents the ablation study and develops
+the role-complementarity principle. Section~\ref{sec:xai} analyses the
+Grad-CAM++ and LIME explainability panels. Section~\ref{sec:discussion}
+discusses the findings, compares them to prior multi-class systems, and
+acknowledges limitations. Section~\ref{sec:conclusion} concludes.

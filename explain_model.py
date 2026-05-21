@@ -53,6 +53,7 @@ from models.architecture import MultiTaskOralClassifier
 from compute_model_metrics import (
     BinaryHeadWrapper, SubtypeHeadWrapper, get_gradcam_target_layer,
 )
+from utils.ablation import ABLATIONS, branches_for, run_name_for
 
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 IMAGENET_STD  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
@@ -218,9 +219,77 @@ def build_panel(model, backbone_name, samples, device, head, save_path,
 # Main
 # ---------------------------------------------------------------------------
 
+def _parse_run_folder(folder_name):
+    """Folder name -> (backbone, ablation, recipe, hub_version). None if unrecognised."""
+    if folder_name == 'custom_efficientnet_v2_hub_v2':
+        return 'custom_efficientnet_v2', None, 'baseline', 'v2'
+    if folder_name == 'custom_efficientnet_v2_baseline_recipe':
+        return 'custom_efficientnet_v2', 'full', 'baseline', 'v1'
+    if folder_name.startswith('custom_efficientnet_v2_ablation_'):
+        key = folder_name[len('custom_efficientnet_v2_ablation_'):]
+        if key in ABLATIONS:
+            return 'custom_efficientnet_v2', key, 'baseline', 'v1'
+        return None
+    return folder_name, None, 'tuned', 'v1'
+
+
+def _explain_run(backbone, ablation, recipe, device, test_loader, args, hub_version='v1'):
+    save_dir = os.path.join(config.BASE_PATH, 'results',
+                             run_name_for(backbone, ablation, recipe,
+                                          hub_version=hub_version))
+    model_path = os.path.join(save_dir, 'best_model.pth')
+    bin_out = os.path.join(save_dir, 'explain_binary.png')
+    sub_out = os.path.join(save_dir, 'explain_subtype.png')
+
+    if not os.path.exists(model_path):
+        print(f"[skip] {save_dir} - no best_model.pth")
+        return
+    if not args.force and os.path.exists(bin_out) and os.path.exists(sub_out):
+        print(f"[done] {save_dir} - explain_*.png already present")
+        return
+
+    print(f"\n=== {save_dir} ===")
+    branches = branches_for(ablation) if ablation is not None else None
+    model_kwargs = {'backbone': backbone, 'hub_version': hub_version}
+    if branches is not None or ablation is not None:
+        model_kwargs['attention_branches'] = branches
+    model = MultiTaskOralClassifier(**model_kwargs).to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+
+    if args.force or not os.path.exists(bin_out):
+        print("[1/2] Binary head...")
+        bin_samples = collect_diverse_samples(test_loader, args.num_samples,
+                                                num_classes=2, label_idx=1)
+        build_panel(model, backbone, bin_samples, device, head='binary',
+                    save_path=bin_out, lime_samples=args.lime_samples,
+                    skip_gradcam=args.skip_gradcam, skip_lime=args.skip_lime)
+
+    if args.force or not os.path.exists(sub_out):
+        print("[2/2] Subtype head...")
+        sub_samples = collect_diverse_samples(test_loader, args.num_samples,
+                                                num_classes=len(DS2_CLASSES),
+                                                label_idx=2)
+        build_panel(model, backbone, sub_samples, device, head='subtype',
+                    save_path=sub_out, lime_samples=args.lime_samples,
+                    skip_gradcam=args.skip_gradcam, skip_lime=args.skip_lime)
+
+
 def main():
     parser = argparse.ArgumentParser(description='LIME + GradCAM explainability')
     parser.add_argument('--backbone', type=str, default=BACKBONE)
+    parser.add_argument('--ablation', type=str, default=None,
+                        choices=sorted(ABLATIONS.keys()),
+                        help='Ablation key (custom_efficientnet_v2 only)')
+    parser.add_argument('--recipe', type=str, default='tuned',
+                        choices=['tuned', 'baseline'])
+    parser.add_argument('--hub-version', type=str, default='v1',
+                        choices=['v1', 'v2'],
+                        help='AttentionHub variant. v2 = sequential Triplet->EMA.')
+    parser.add_argument('--all-missing', action='store_true',
+                        help='Loop every results/* folder; skip those with explain_*.png')
+    parser.add_argument('--force', action='store_true',
+                        help='Re-generate even if explain_*.png exists')
     parser.add_argument('--num-samples', type=int, default=2,
                         help='Samples per class to explain')
     parser.add_argument('--lime-samples', type=int, default=500,
@@ -239,14 +308,7 @@ def main():
     set_seed()
     device = get_device()
 
-    save_dir   = os.path.join(config.BASE_PATH, 'results', args.backbone)
-    model_path = os.path.join(save_dir, 'best_model.pth')
-    if not os.path.exists(model_path):
-        print(f"Model not found: {model_path}\nTrain it first with:\n"
-              f"  python train.py --backbone {args.backbone}")
-        sys.exit(1)
-
-    print(f"Loading test set + model ({args.backbone})...")
+    print("Loading test set...")
     d1p, d1b, d1s = load_dataset1_split('test')
     d2p, d2b, d2s = load_dataset2_split('test')
     test_ds = OralPathologyDataset(d1p + d2p, d1b + d2b, d1s + d2s,
@@ -255,26 +317,21 @@ def main():
                               shuffle=False, num_workers=0, pin_memory=True)
     print(f"Test images: {len(test_ds)}")
 
-    model = MultiTaskOralClassifier(backbone=args.backbone).to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.eval()
-
-    print("\n[1/2] Binary head...")
-    bin_samples = collect_diverse_samples(test_loader, args.num_samples,
-                                            num_classes=2, label_idx=1)
-    build_panel(model, args.backbone, bin_samples, device, head='binary',
-                save_path=os.path.join(save_dir, 'explain_binary.png'),
-                lime_samples=args.lime_samples,
-                skip_gradcam=args.skip_gradcam, skip_lime=args.skip_lime)
-
-    print("\n[2/2] Subtype head...")
-    sub_samples = collect_diverse_samples(test_loader, args.num_samples,
-                                            num_classes=len(DS2_CLASSES),
-                                            label_idx=2)
-    build_panel(model, args.backbone, sub_samples, device, head='subtype',
-                save_path=os.path.join(save_dir, 'explain_subtype.png'),
-                lime_samples=args.lime_samples,
-                skip_gradcam=args.skip_gradcam, skip_lime=args.skip_lime)
+    if args.all_missing:
+        results_root = os.path.join(config.BASE_PATH, 'results')
+        for name in sorted(os.listdir(results_root)):
+            full = os.path.join(results_root, name)
+            if not os.path.isdir(full):
+                continue
+            parsed = _parse_run_folder(name)
+            if parsed is None:
+                print(f"[skip] {name} - unrecognised folder pattern")
+                continue
+            bb, ab, rc, hv = parsed
+            _explain_run(bb, ab, rc, device, test_loader, args, hub_version=hv)
+    else:
+        _explain_run(args.backbone, args.ablation, args.recipe,
+                     device, test_loader, args, hub_version=args.hub_version)
 
     print("\nDone.")
 

@@ -1,9 +1,9 @@
 {
   "backbone": "efficientnet_v2s",
   "model_size_mb": 82.86,
-  "flops_raw": 5699862400,
-  "flops_gflops": 5.7,
-  "num_parameters": 21493849,
+  "flops_raw": 2710935552,
+  "flops_gflops": 2.711,
+  "num_parameters": 21224705,
   "batch_time_ms": 43.362,
   "estimated_epoch_time_s": 2.342,
   "inference_time_ms_mean": 19.107,
@@ -23,5 +23,5 @@
     "p95_ms": 25.595,
     "p99_ms": 25.782
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }

@@ -1,0 +1,163 @@
+\section{Explainability Analysis}\label{sec:xai}
+
+A high test accuracy is necessary but not sufficient evidence that a
+medical-imaging classifier is clinically defensible: the model must also be
+shown to attend to lesion tissue rather than to incidental cues such as teeth,
+lip outlines, or lighting artifacts. To supply that evidence, every model in
+the study is accompanied by two complementary explanations for both heads ---
+a Gradient-weighted Class Activation Mapping++ (Grad-CAM++) saliency panel and
+a Local Interpretable Model-Agnostic Explanations (LIME) boundary-mask panel.
+The artifacts are produced by a single script, \texttt{explain\_model.py}, with
+identical preprocessing across all ten architectures, and are stored per model
+as \texttt{explain\_binary.png} and \texttt{explain\_subtype.png}. This section
+reports the patterns observed on the proposed model
+(Section~\ref{subsec:gradcampp} and Section~\ref{subsec:lime}) and then ranks
+all models by how closely their saliency aligns with visible pathology
+(Section~\ref{subsec:xai_compare}).
+
+\subsection{Grad-CAM++ Saliency}\label{subsec:gradcampp}
+
+Grad-CAM++~\cite{chattopadhyay2018gradcampp} extends
+Grad-CAM~\cite{selvaraju2017gradcam} by improving the localization of multiple,
+and of spatially small, instances of the target class: it replaces the global
+gradient average with a pixel-wise weighted combination of higher-order
+gradients. We adopt it as the gradient-based saliency method for every backbone,
+computed on the final stage of the network so that the map reflects the
+representation immediately consumed by the classification heads:
+
+\begin{itemize}
+  \item For the convolutional baselines (ResNet50, DenseNet121,
+  ConvNeXt-Tiny, the EfficientNet variants, and Inception~V3) the target layer
+  is the last convolutional block.
+  \item For Swin-T the target is the last attention block prior to global
+  pooling.
+  \item For the proposed Custom EfficientNet~V2 the target is Stage~5 --- the
+  MBConv+SE block immediately downstream of the AttentionHub --- so that the
+  map captures the feature representation the hub hands to Stage~5.
+\end{itemize}
+
+\noindent For each image the class index is taken from the relevant head's
+predicted argmax, and the resulting per-image attention map is overlaid on the
+input.
+
+Inspection of the proposed model's panels --- \texttt{explain\_binary.png} and
+\texttt{explain\_subtype.png} of the \texttt{custom\_efficientnet\_v2\_hub\_v2}
+run --- reveals four recurring patterns. \emph{First}, lip-margin benign cases
+receive broad, diffuse attention spread across the visible mucosal area with no
+focal fixation on the teeth, indicating that the model reasons over the
+lesion-bearing tissue rather than over incidental hard-tissue cues.
+\emph{Second}, white-plaque benign cases receive a single tight focal spot
+placed directly on the visible plaque; this is the most spatially concentrated
+activation in the panel and is anatomically correct. \emph{Third},
+diffuse-mucosa malignant cases receive a distributed, multi-spot activation
+over the lesion region, which is appropriate for lesions whose boundary is not
+sharply defined. \emph{Fourth}, focal-bump malignant cases receive two crisp
+focal spots that coincide with the two visible bumps --- in clinical terms, the
+kind of annotation a junior clinician would draw on the image directly.
+
+A clarification on what this map does and does not probe is warranted. The
+AttentionHub is located at Stage~4, whereas the saliency above is computed at
+Stage~5, one block downstream of the hub. The map therefore characterises the
+representation that the classification heads consume, not the internal
+behaviour of the hub itself; we make no causal attribution of these Stage-5
+patterns to specific hub modules. What the map does support is the property
+that matters clinically: the Stage-5 representation handed to the heads is
+lesion-focused, exhibiting \emph{broad} attention on diffuse lesions and
+\emph{focal} attention on bump-like lesions and showing no fixation on teeth or
+lip outlines. This is qualitatively consistent with the role-complementarity
+argument that motivated the v2 design in Section~\ref{sec:ablation}, without
+being treated as direct evidence of it. Figure~\ref{fig:xai_proposed} collects
+six hand-curated test cases that exhibit these patterns.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig06c_proposed_explain_panel_landscape}
+  \caption{Explainability showcase for the proposed Custom EfficientNet~V2
+  (AttentionHub-v2). Six curated test cases are arranged in a $3\times2$ grid;
+  within each cell the input is shown next to its Grad-CAM++ heat-map and its
+  LIME boundary mask (columns \emph{Original} $\mid$ \emph{Grad-CAM++} $\mid$
+  \emph{LIME}). The cases span the binary head (a malignant ulcerated lesion)
+  and the subtype head (CoS lip and perioral-skin lesions, an OC raised tongue
+  lesion, a Gum inflamed lip margin, and OLP striations). Across all cases the
+  Grad-CAM++ peak coincides with the visible lesion --- a tight focal spot on
+  compact lesions and an elongated map tracing the contour of linear lesions
+  --- and the LIME contour traces the lesion boundary rather than surrounding
+  teeth or skin.}
+  \label{fig:xai_proposed}
+\end{figure*}
+
+\subsection{LIME Boundary Masks}\label{subsec:lime}
+
+Grad-CAM++ is gradient-based and therefore tied to the internal structure of
+the network; to obtain a model-agnostic second opinion we additionally compute
+LIME~\cite{ribeiro2016lime}. LIME segments each test image into super-pixels,
+perturbs them by occlusion, and fits a sparse interpretable surrogate to the
+resulting changes in predicted class probability, yielding a boundary mask over
+the super-pixels whose perturbation most strongly affects the decision. Because
+LIME treats the classifier as a black box, agreement between its masks and the
+Grad-CAM++ heat-maps is non-trivial corroboration rather than a restatement of
+the same signal.
+
+For the proposed model the two explanations are mutually consistent: the LIME
+masks align with the Grad-CAM++ heat-maps and with the visible lesion tissue
+across the curated cases of Figure~\ref{fig:xai_proposed}. The agreement is
+sharpest on the focal-bump cases, where the LIME boundaries are tight around
+the bumps themselves. This property is not universal across the benchmark ---
+several baselines, notably ConvNeXt-Tiny under from-scratch training and Swin-T
+on small lesions, produce LIME boundaries that bleed into the teeth or the
+surrounding skin. The convergence of a gradient-based and a perturbation-based
+explainer on the same lesion-centred regions strengthens the claim that the
+proposed model's decisions rest on pathology rather than on surrounding context.
+
+\subsection{Cross-Model Comparison}\label{subsec:xai_compare}
+
+To place the proposed model's interpretability in context, the Grad-CAM++ maps
+of the strongest architectures are compared on a fixed set of input images.
+Because all runs share the same deterministic seed and split, a given row index
+in \texttt{explain\_binary.png} corresponds to the same physical image across
+models, so the comparison isolates the effect of the architecture rather than
+of the input. Figure~\ref{fig:xai_cross} arranges these maps for the proposed
+model and four representative baselines on four common binary samples.
+
+A side-by-side review of the Grad-CAM++ panels supports a qualitative
+three-tier ordering, from most to least clinically aligned. We emphasise that
+this ordering is a visual judgement of the released panels rather than a
+quantitative interpretability measurement: the dataset carries no lesion masks,
+so mask-based metrics such as pointing-game accuracy cannot be computed, and no
+quantitative interpretability score is reported here. The ordering should
+therefore be read as indicative. The \emph{most aligned} tier comprises the
+Custom EfficientNet~V2 (AttentionHub-v2), EfficientNet~V2-B2, and
+Inception~V3: all three concentrate their activation on lesion tissue with
+negligible response on teeth or skin. The \emph{mid-tier} comprises ResNet50,
+DenseNet121, and EfficientNet-B0, which generally localize the lesion correctly
+but exhibit occasional spurious activation on lip outlines. The \emph{weakest}
+tier is ConvNeXt-Tiny, whose attention often broadens across the entire oral
+cavity without lesion-specific concentration --- a behaviour consistent with
+its low quantitative accuracy (95.32\,\% binary, 90.46\,\% subtype, see
+Table~\ref{tab:benchmark}) and with its failure to reach the early-stopping
+criterion under from-scratch training.
+
+The interpretability advantage of the proposed model is therefore not merely a
+quantitative claim derived from accuracy: it is directly visible in the
+Grad-CAM++ and LIME panels released with this paper. The same architecture that
+attains the highest subtype accuracy in the benchmark among the nine baselines
+also produces the saliency maps most tightly bound to visible pathology, and a
+gradient-based and a model-agnostic explainer agree on this lesion-centred
+alignment. This evidence is qualitative; a quantitative interpretability
+measure is identified as future work in Section~\ref{subsec:limitations}.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig06_gradcam_cross_model_composite}
+  \caption{Cross-model Grad-CAM++ comparison on four common binary test samples
+  (two benign, two malignant). Rows correspond to ResNet50, DenseNet121,
+  EfficientNet~V2-B2, Inception~V3, and the proposed Custom EfficientNet~V2
+  (AttentionHub-v2, highlighted); columns correspond to the four shared inputs.
+  The deterministic seed and split guarantee that each column is the same
+  physical image across all rows, so differences in the heat-maps reflect the
+  backbone alone. The proposed model and the two strongest baselines
+  (EfficientNet~V2-B2, Inception~V3) concentrate activation on lesion tissue,
+  whereas weaker backbones spread activation onto lip outlines and surrounding
+  regions.}
+  \label{fig:xai_cross}
+\end{figure*}

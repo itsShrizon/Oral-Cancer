@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 import timm
 
-from .attention_hub import AttentionHub
+from .attention_hub import AttentionHub, AttentionHubV2
 
 
 class CustomEfficientNetV2(nn.Module):
@@ -37,10 +37,25 @@ class CustomEfficientNetV2(nn.Module):
     num_features = 192  # exposed for MultiTaskOralClassifier compatibility
 
     def __init__(self, num_classes: int = 2, pretrained: bool = False,
-                 dropout: float = 0.2, verbose: bool = False):
+                 dropout: float = 0.2, verbose: bool = False,
+                 attention_branches=None, hub_version: str = 'v1'):
+        """
+        attention_branches:
+          - None (default): full AttentionHub (BAM + Triplet + KAN). Matches
+            the originally proposed model and the existing checkpoint.
+          - tuple/list/set with subset of {"bam","triplet","kan"}: build a
+            partial AttentionHub for ablation.
+          - empty tuple/list (): replace stage4 with the donor's original
+            Block-4 (canonical EfficientNetV2-B0 MBConv+SE). This is the
+            "no attention" control — exactly the layer the hub replaces.
+        """
         super().__init__()
         self.verbose = verbose
         self._num_classes = num_classes
+        self.attention_branches = attention_branches
+        if hub_version not in ('v1', 'v2'):
+            raise ValueError(f"hub_version must be 'v1' or 'v2', got {hub_version!r}")
+        self.hub_version = hub_version
 
         # --- Load donor backbone ---
         donor = timm.create_model("tf_efficientnetv2_b0",
@@ -67,8 +82,20 @@ class CustomEfficientNetV2(nn.Module):
         # Stage 3: block 3 (MBConv, out=96)
         self.stage3 = donor.blocks[3]
 
-        # Stage 4: Custom AttentionHub (in=96, out=112)
-        self.stage4 = AttentionHub(in_channels=96, out_channels=112)
+        # Stage 4: Custom AttentionHub (in=96, out=112) — or no-attention control.
+        if hub_version == 'v2':
+            # V2: sequential Triplet->EMA cascade with LayerScale gates.
+            # Ignores attention_branches (which is a v1-only ablation knob).
+            self.stage4 = AttentionHubV2(in_channels=96, out_channels=112)
+        elif attention_branches is None:
+            self.stage4 = AttentionHub(in_channels=96, out_channels=112)
+        elif len(tuple(attention_branches)) == 0:
+            # No-attention control: use the donor's original Block-4
+            # (MBConv+SE, 96->112) — i.e. the layer the AttentionHub replaces.
+            self.stage4 = donor.blocks[4]
+        else:
+            self.stage4 = AttentionHub(in_channels=96, out_channels=112,
+                                       branches=tuple(attention_branches))
 
         # Stage 5: block 5 (MBConv+SE, out=192)
         self.stage5 = donor.blocks[5]

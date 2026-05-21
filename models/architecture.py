@@ -25,27 +25,34 @@ class MultiTaskOralClassifier(nn.Module):
     Shared Backbone with Two Independent Parallel Heads.
     Uses 'timm' for flexible backbone selection.
     """
-    def __init__(self, backbone=None, num_subtypes=None, dropout=None, pretrained=None):
+    def __init__(self, backbone=None, num_subtypes=None, dropout=None, pretrained=None,
+                 attention_branches=None, hub_version='v1'):
         super(MultiTaskOralClassifier, self).__init__()
-        
+
         # Resolve config with arguments or defaults
         self.backbone_name = backbone if backbone else BACKBONE
         self.num_subtypes = num_subtypes if num_subtypes is not None else NUM_SUBTYPES
         self.dropout_val = dropout if dropout is not None else DROPOUT
         self.use_pretrained = pretrained if pretrained is not None else USE_PRETRAINED
-        
+        # Only meaningful for the custom backbone — controls AttentionHub ablation.
+        self.attention_branches = attention_branches
+        # Only meaningful for the custom backbone — selects AttentionHub version.
+        self.hub_version = hub_version
+
         # Determine timm model name
         if self.backbone_name not in BACKBONE_MAP:
             raise ValueError(f"Unsupported backbone: {self.backbone_name}. Supported: {list(BACKBONE_MAP.keys())}")
-            
+
         timm_model_name = BACKBONE_MAP[self.backbone_name]
         print(f"Initializing {self.backbone_name} ({timm_model_name}) with pretrained={self.use_pretrained}")
-        
+
         # Initialize backbone
         if self.backbone_name == 'custom_efficientnet_v2':
             # Custom model as feature extractor (num_classes=0)
             self.backbone = CustomEfficientNetV2(
-                num_classes=0, pretrained=self.use_pretrained
+                num_classes=0, pretrained=self.use_pretrained,
+                attention_branches=attention_branches,
+                hub_version=hub_version,
             )
         else:
             self.backbone = timm.create_model(

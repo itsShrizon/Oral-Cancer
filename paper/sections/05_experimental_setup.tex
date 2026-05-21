@@ -1,0 +1,91 @@
+\section{Experimental Setup}\label{sec:setup}
+
+This section records the hardware and software environment in which every
+experiment was executed, the provisions made to keep the study
+reproducible, and the ethical considerations that bound its scope.
+
+\subsection{Hardware and Software Stack}\label{ssec:hardware}
+
+All experiments are executed on a single workstation equipped with an
+\textbf{NVIDIA GeForce RTX~4060~Ti} graphics processing unit (16~GB GDDR6),
+32~GB of system memory, and an AMD Ryzen~7 central processing unit. Using a
+single fixed machine for every run keeps the measured latency, GPU peak
+memory, training time, and energy figures mutually comparable, since they
+are not contaminated by hardware variation across models. The exact Ryzen~7
+SKU was not recorded; this does not affect the latency and GPU-memory
+figures, which are GPU-bound and CPU-insensitive, but it is relevant to the
+wall-clock training time of Table~3, the one CPU-sensitive measurement, and
+that table is therefore reported with the explicit caveat given in
+Section~\ref{sec:results} that wall-clock training time is not controlled
+across runs.
+
+The software stack is held fixed across all runs: Python~3.11 and
+PyTorch~2.x with CUDA~12; \texttt{timm}~0.9 for the structural definition of
+the donor EfficientNetV2-B0 backbone --- only the architectural reference is
+used, and the pre-trained weights are explicitly \emph{not} loaded, in
+keeping with the from-scratch training protocol of
+Section~\ref{ssec:training}; \texttt{thop} for floating-point operation
+counting; \texttt{pytorch-grad-cam}~1.5 for the Grad-CAM++ saliency maps;
+\texttt{lime}~0.2 together with \texttt{scikit-image} for the super-pixel
+boundary masks; and \texttt{codecarbon} for energy and
+CO\textsubscript{2}-equivalent emissions tracking. Deterministic CuDNN is
+enabled for every reported run.
+
+\subsection{Reproducibility Provisions}\label{ssec:reproducibility}
+
+The complete experimental package is structured for reproducibility along
+five axes.
+
+\begin{enumerate}
+  \item \textbf{Code and configuration release.} The full training,
+  evaluation, and metric-computation scripts are provided in the
+  repository. A single configuration file (\texttt{configs/config.py})
+  controls every global hyper-parameter and is enforced across all runs, so
+  that the matched recipe of Section~\ref{ssec:training} cannot drift
+  between models.
+  \item \textbf{Fixed seed.} Every run uses random seed 42 for Python,
+  NumPy, and PyTorch, and CuDNN deterministic mode is enabled.
+  \item \textbf{Fixed split.} The dataset splits are deterministic functions
+  of the seed, which makes train/test contamination across runs impossible
+  by construction.
+  \item \textbf{Per-run JSON.} Every one of the ten models --- the nine
+  baseline backbones and the proposed model --- emits a
+  \texttt{classification\_metrics.json}, a \texttt{performance\_metrics%
+  .json}, a \texttt{training\_time.json}, and a per-class textual report
+  (\texttt{evaluation\_results.txt}); all of these are committed alongside
+  the trained model weights, so that every classification and computational
+  number reported in Section~\ref{sec:results} can be independently
+  regenerated for both the baseline rows and the proposed model.
+  \item \textbf{Explainability artifacts.} The Grad-CAM++ and LIME panels for
+  both heads (\texttt{explain\_binary.png} and
+  \texttt{explain\_subtype.png}) are produced by a single script
+  (\texttt{explain\_model.py}) under identical preprocessing for every
+  model.
+\end{enumerate}
+
+A small number of runs --- the AttentionHub ablation cells --- include
+\texttt{codecarbon}-measured energy and CO\textsubscript{2} figures, whereas
+the older baseline runs report the conservative analytical estimate used in
+the absence of \texttt{codecarbon} at the time those runs were executed. We
+retain both forms of the measurement, and label them as such, in the
+interest of transparency.
+
+\subsection{Ethical Considerations}\label{ssec:ethics}
+
+The datasets used in this study are pre-existing curated collections of oral
+lesion images. They are used solely for non-clinical research purposes, and
+all results are reported on a held-out split that is disjoint from the
+training and validation data. No patient-identifying information is present
+in the datasets, and no human subjects are recruited as part of this work.
+
+The proposed model is \emph{not} a clinical decision-support system and
+should not be used as one without appropriate clinical validation,
+regulatory clearance, and prospective evaluation. We further acknowledge
+that automated screening systems can perpetuate disparities present in their
+training data: in particular, the demographic composition and
+intra-oral-anatomy coverage of the datasets are not characterised in their
+published metadata, and external validation across diverse patient
+populations is required before any clinical claim can be made. The model is
+released under a research-use license, with the explicit intent of enabling
+replication and methodological extension rather than direct clinical
+deployment.

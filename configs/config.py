@@ -21,7 +21,7 @@ NUM_SUBTYPES = len(DS2_CLASSES)
 # Model configuration
 IMG_SIZE = 224
 BATCH_SIZE = 64
-NUM_WORKERS = 0
+NUM_WORKERS = 4
 # BACKBONE Options:
 # 'resnet50'        - ResNet50 (Default)
 # 'densenet121'     - DenseNet121

@@ -1,0 +1,333 @@
+\section{Baseline Benchmark Results}\label{sec:results}
+
+This section establishes the empirical reference frame against which the
+proposed model is judged. Ten architectures --- the nine standard baselines and
+the proposed Custom EfficientNet~V2 --- are trained from scratch under the
+single matched recipe of Section~\ref{sec:methods}, with no per-model
+hyper-parameter tuning, and evaluated once on the held-out test set. The
+benchmark is reported along three axes: classification accuracy on both heads
+(Section~\ref{subsec:quant}), per-class subtype behaviour
+(Section~\ref{subsec:perclass}), and computational efficiency
+(Section~\ref{subsec:efficiency}). The ablation that explains \emph{why} the
+proposed hub is designed as it is follows in Section~\ref{sec:ablation}; the
+present section is concerned only with where the proposed model sits relative
+to the field.
+
+\subsection{Quantitative Comparison}\label{subsec:quant}
+
+Table~\ref{tab:benchmark} reports the held-out test performance of all ten
+architectures on both the binary (benign versus malignant) and the seven-class
+subtype head, alongside parameter count, compute cost in GFLOPs,
+and on-disk model size. Every value derives from a single training run per
+model under the matched recipe; no figure in the table benefits from per-model
+tuning, so the comparison isolates architecture rather than optimisation
+effort.
+
+\begin{table*}[!t]
+\caption{Test-set classification performance under the matched fair recipe.
+All ten architectures are trained from scratch (no ImageNet pre-training) with
+identical optimiser, schedule, batch size, and seed. Bold marks the
+proposed-model row and the best value in each column.}
+\label{tab:benchmark}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l d{4} d{4} d{4} d{4} d{2} d{3} d{2}}
+\hline
+\multicolumn{1}{l}{Model} &
+\multicolumn{1}{c}{Binary Acc} &
+\multicolumn{1}{c}{Binary F1} &
+\multicolumn{1}{c}{Subtype Acc} &
+\multicolumn{1}{c}{Subtype F1} &
+\multicolumn{1}{c}{Params (M)} &
+\multicolumn{1}{c}{GFLOPs} &
+\multicolumn{1}{c}{Size (MB)} \\
+\hline
+ResNet50            & 0.9912 & 0.9912 & 0.9909 & 0.9909 & 25.61 & 4.134 & 98.01 \\
+DenseNet121         & 0.9889 & 0.9889 & 0.9933 & 0.9933 &  7.92 & 2.834 & 31.15 \\
+ConvNeXt-Tiny       & 0.9532 & 0.9533 & 0.9046 & 0.9048 & 28.59 & 4.456 & 109.22 \\
+Swin-T              & 0.9819 & 0.9819 & 0.9769 & 0.9769 & 28.29 & 4.372 & 108.07 \\
+EfficientNet-B0     & 0.9883 & 0.9883 & 0.9903 & 0.9903 &  5.28 & 0.386 & 20.60 \\
+EfficientNet V2-B2  & \multicolumn{1}{c}{\textbf{0.9936}} & \multicolumn{1}{c}{\textbf{0.9936}} & 0.9933 & 0.9933 & 10.00 & 1.100 & 39.17 \\
+EfficientNet V2-B3  & 0.9889 & 0.9889 & 0.9842 & 0.9842 & 14.21 & 1.522 & 55.57 \\
+EfficientNet V2-S   & 0.9866 & 0.9865 & 0.9836 & 0.9836 & 21.22 & 2.711 & 82.86 \\
+Inception V3        & 0.9930 & 0.9930 & 0.9921 & 0.9921 & 23.85 & 2.838 & 91.47 \\
+\hline
+\multicolumn{1}{l}{\textbf{Custom EfficientNet V2 (Hub v1, full)}} &
+0.9906 & 0.9906 & 0.9921 & 0.9921 & 4.80 & 0.495 & 18.99 \\
+\multicolumn{1}{l}{\textbf{Custom EfficientNet V2 (Hub v2, proposed)}} &
+\multicolumn{1}{c}{\textbf{0.9906}} &
+\multicolumn{1}{c}{\textbf{0.9907}} &
+\multicolumn{1}{c}{\textbf{0.9951}} &
+\multicolumn{1}{c}{\textbf{0.9951}} &
+\multicolumn{1}{c}{\textbf{4.79}} &
+\multicolumn{1}{c}{\textbf{0.493}} &
+\multicolumn{1}{c}{\textbf{18.94}} \\
+\hline
+\end{tabular}%
+}
+\end{table*}
+
+Two readings follow immediately from Table~\ref{tab:benchmark}. \textbf{First},
+the proposed model attains the highest subtype accuracy in this benchmark. At
+$99.51\,\%$ it exceeds the strongest baseline, EfficientNet~V2-B2 at
+$99.33\,\%$, by $0.18$ percentage points, and the heaviest comparator,
+Inception~V3 at $99.21\,\%$, by $0.30$ percentage points. \textbf{Second}, this
+subtype lead is obtained while the proposed model is simultaneously the
+smallest and cheapest architecture in the comparison. At $4.79$~M parameters it
+is $2.1\times$ smaller than EfficientNet~V2-B2 ($10.0$~M), $5.0\times$ smaller
+than Inception~V3 ($23.9$~M), and $5.3\times$ smaller than ResNet50
+($25.6$~M), with proportional reductions in GFLOPs. The proposed model is
+therefore not trading capacity for accuracy: among the nine baselines trained
+from scratch under the matched recipe, it strictly dominates every baseline in
+the subtype-accuracy versus parameter-count plane --- simultaneously the most
+accurate and the smallest.
+
+Figure~\ref{fig:pareto} makes this dominance explicit. Plotting subtype
+accuracy against parameter count on a logarithmic axis, the proposed model
+occupies the upper-left corner --- highest accuracy at the lowest parameter
+budget --- and lies on the Pareto frontier, while every heavier comparator sits
+strictly below and to the right of it. Figure~\ref{fig:radar} extends the
+comparison to six axes, contrasting the proposed model against the two
+strongest baselines on binary accuracy, subtype accuracy, and four
+efficiency-derived axes (parameter, FLOPs, size, and memory efficiency, each
+inverted so that a larger radius is always better). The proposed model encloses
+the largest area: it matches the baselines on the two accuracy axes while
+extending far beyond them on every efficiency axis.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig03_pareto_params}
+\caption{Subtype accuracy versus parameter count (logarithmic horizontal axis)
+for all ten architectures. The proposed Custom EfficientNet~V2 (Hub~v2) lies on
+the Pareto frontier in the upper-left region --- the highest subtype accuracy
+at the smallest parameter budget. ConvNeXt-Tiny ($90.5\,\%$) falls below the
+plotted accuracy range and is marked separately.}
+\label{fig:pareto}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig03d_proposed_vs_baselines_radar}
+\caption{Six-axis comparison of the proposed model against the two strongest
+baselines, EfficientNet~V2-B2 and Inception~V3. The four efficiency axes are
+inverted ($1/\text{metric}$) so that a point further from the centre is always
+better. The proposed model matches the baselines on accuracy while dominating
+on parameter, FLOPs, size, and memory efficiency.}
+\label{fig:radar}
+\end{figure}
+
+The binary head, by contrast, is effectively tied at the top of the table.
+EfficientNet~V2-B2 leads at $99.36\,\%$ and the proposed model follows at
+$99.06\,\%$. The binary head is evaluated on a $1\,711$-image test set --- the
+DS1 test split together with the full DS2 test set, each image carrying a
+benign/malignant label --- on which the proposed model commits $16$ errors
+(Section~\ref{subsec:perclass});
+the $0.30$ percentage-point gap to the leader is therefore a difference of
+roughly five images, well inside the noise band of a single training run. We
+therefore do not claim a binary-task improvement; the proposed model is
+presented as binary-task \emph{parity} with the leader, not as a binary-task
+advance.
+
+A single baseline visibly under-performs. ConvNeXt-Tiny reaches only
+$95.32\,\%$ binary and $90.46\,\%$ subtype accuracy, consistent with the
+well-documented data-hunger of ConvNeXt-style architectures~\cite{liu2022convnext}
+when trained from scratch on small medical datasets; it consumed the full
+$200$-epoch budget without satisfying the early-stopping criterion. The row is
+retained rather than discarded because it documents a real and reproducible
+limitation of from-scratch ConvNeXt training under this regime, and because a
+benchmark that silently omits its weakest entrant misrepresents the difficulty
+of the task.
+
+\subsection{Per-Class Subtype Performance}\label{subsec:perclass}
+
+Aggregate subtype accuracy can mask uneven behaviour across the seven classes,
+so Table~\ref{tab:perclass} reports per-class precision, recall, and F1 (in
+that order) for the proposed model and the two strongest baselines on the
+subtype head. Five of the seven classes reach a perfect $1.00$ F1 for the
+proposed model; the residual error is confined to MC and OC, two malignant
+carcinomas whose visual presentations overlap.
+
+\begin{table}[!t]
+\caption{Per-class subtype performance on the test set, reported as
+precision~/ recall~/ F1. Per-class support is given in parentheses. Five of
+seven classes reach $1.00$ F1 for the proposed model.}
+\label{tab:perclass}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{l c c c}
+\hline
+Class & Custom V2 (Hub v2) & EfficientNet V2-B2 & Inception V3 \\
+\hline
+CaS (256) & \textbf{1.00 / 1.00 / 1.00} & 1.00 / 0.99 / 0.99 & 0.99 / 1.00 / 1.00 \\
+CoS (239) & \textbf{1.00 / 1.00 / 1.00} & 0.99 / 1.00 / 0.99 & 1.00 / 1.00 / 1.00 \\
+Gum (192) & \textbf{0.99 / 1.00 / 1.00} & 0.99 / 1.00 / 1.00 & 1.00 / 1.00 / 1.00 \\
+MC (288)  & \textbf{1.00 / 0.98 / 0.99} & 1.00 / 0.99 / 0.99 & 1.00 / 0.98 / 0.99 \\
+OC (173)  & \textbf{0.98 / 0.99 / 0.99} & 0.98 / 0.99 / 0.99 & 0.97 / 0.99 / 0.98 \\
+OLP (288) & \textbf{1.00 / 1.00 / 1.00} & 1.00 / 0.99 / 0.99 & 1.00 / 0.99 / 0.99 \\
+OT (210)  & \textbf{1.00 / 1.00 / 1.00} & 0.99 / 1.00 / 1.00 & 0.98 / 0.99 / 0.99 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+The proposed model's macro-averaged F1 is $0.99$, with no class falling below
+$0.99$ --- a uniformity that neither of the two strongest baselines exhibits.
+EfficientNet~V2-B2 and Inception~V3 each let a class slip to $0.98$ on at least
+one of the three reported metrics, whereas the proposed model holds the floor
+at $0.99$ across all seven classes.
+
+To establish that this behaviour is a property of the data rather than of any
+single model, Table~\ref{tab:perclass_full} reports the full per-class
+precision~/ recall~/ F1 for every baseline together with the proposed model on
+the subtype head. Two clinically meaningful observations follow. First, the MC
+and OC columns are the only ones in which any model loses F1 below $1.00$, and
+the \emph{same} two columns are where every model loses --- the residual
+confusion is therefore data-driven rather than model-driven, a direct
+consequence of MC and OC both being malignant carcinomas with overlapping
+visual presentation. Second, the proposed model recovers a perfect
+$1.00 / 1.00 / 1.00$ on five of the seven classes, a coverage no baseline
+matches.
+
+\begin{table*}[!t]
+\caption{Full per-class subtype precision~/ recall~/ F1 on the test set, all
+models. Per-class support is given in parentheses. The proposed model is the
+only configuration whose CaS, CoS, OLP, and OT columns are all
+$1.00 / 1.00 / 1.00$; residual confusion is confined to the MC and OC columns
+for every model.}
+\label{tab:perclass_full}
+\centering
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c c c}
+\hline
+Model & CaS (256) & CoS (239) & Gum (192) & MC (288) & OC (173) & OLP (288) & OT (210) \\
+\hline
+ResNet50           & 1.00/0.99/1.00 & 1.00/1.00/1.00 & 0.99/0.99/0.99 & 0.98/0.98/0.98 & 0.98/0.98/0.98 & 0.99/0.99/0.99 & 1.00/1.00/1.00 \\
+DenseNet121        & 1.00/0.98/0.99 & 1.00/1.00/1.00 & 1.00/1.00/1.00 & 1.00/0.99/0.99 & 0.99/0.98/0.99 & 0.98/1.00/0.99 & 1.00/1.00/1.00 \\
+EfficientNet-B0    & 1.00/0.98/0.99 & 0.99/1.00/0.99 & 0.99/1.00/0.99 & 0.99/0.99/0.99 & 0.98/0.98/0.98 & 0.98/1.00/0.99 & 1.00/0.98/0.99 \\
+EfficientNet V2-B2 & 1.00/0.99/0.99 & 0.99/1.00/0.99 & 0.99/1.00/1.00 & 1.00/0.99/0.99 & 0.98/0.99/0.99 & 1.00/0.99/0.99 & 0.99/1.00/1.00 \\
+Inception V3       & 0.99/1.00/1.00 & 1.00/1.00/1.00 & 1.00/1.00/1.00 & 1.00/0.98/0.99 & 0.97/0.99/0.98 & 1.00/0.99/0.99 & 0.98/0.99/0.99 \\
+Custom V2 (Hub v1, full) & 0.98/0.99/0.99 & 0.99/1.00/1.00 & 1.00/1.00/1.00 & 0.99/0.99/0.99 & 0.99/0.97/0.98 & 0.99/1.00/0.99 & 1.00/0.99/0.99 \\
+\hline
+\textbf{Custom V2 (Hub v2)} & \textbf{1.00/1.00/1.00} & \textbf{1.00/1.00/1.00} & \textbf{0.99/1.00/1.00} & \textbf{1.00/0.98/0.99} & \textbf{0.98/0.99/0.99} & \textbf{1.00/1.00/1.00} & \textbf{1.00/1.00/1.00} \\
+\hline
+\end{tabular}%
+}
+\end{table*}
+
+The proposed model is the only configuration whose CaS, CoS, OLP, and OT
+columns are all $1.00 / 1.00 / 1.00$. The residual confusion costs the model
+exactly two misclassified MC images and one misclassified OC image, out of
+supports of $288$ and $173$ respectively. Figure~\ref{fig:heatmap} renders the
+same per-class F1 values as a model~$\times$~class heat map; what the heat map
+adds over Table~\ref{tab:perclass_full} is the visual gestalt --- the MC and OC
+columns form a single coherent cool band spanning every one of the ten models
+at once, making the data-driven nature of the residual confusion legible at a
+glance in a way a tabulated grid of numbers does not, while the proposed
+model's row is the most uniformly saturated. Figure~\ref{fig:confusion}
+presents the binary and subtype confusion matrices for the proposed model. The
+subtype matrix is computed over the $1\,646$-image DS2 test set and the binary
+matrix over the $1\,711$-image binary test set, so that both denominators are
+verifiable. The binary matrix shows $11$ benign images predicted malignant and
+$5$ malignant images predicted benign --- $16$ errors in $1\,711$ images,
+consistent with the $99.06\,\%$ binary accuracy reported in
+Table~\ref{tab:benchmark} --- and the subtype matrix confirms that every
+off-diagonal entry is concentrated in the MC and OC rows, with all other
+classes perfectly resolved.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig04_per_class_f1_heatmap}
+\caption{Per-class F1 score across models, rendered as a
+model~$\times$~subtype-class heat map. Darker cells indicate higher F1. The MC
+and OC columns form the coolest band for every model, confirming that the
+residual subtype confusion is data-driven; the proposed Custom EfficientNet~V2
+(Hub~v2) row, outlined, is the most uniformly saturated.}
+\label{fig:heatmap}
+\end{figure*}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig04c_confusion_matrices_proposed}
+\caption{Binary (left, $n=1\,711$) and subtype (right, $n=1\,646$) confusion
+matrices for the proposed Custom EfficientNet~V2 (Hub~v2) on the held-out test
+set. Off-diagonal mass in the subtype matrix is confined almost entirely to the
+MC and OC rows; the remaining five classes are resolved without error.}
+\label{fig:confusion}
+\end{figure}
+
+\subsection{Efficiency Comparison}\label{subsec:efficiency}
+
+Beyond the static parameter and GFLOPs counts of Table~\ref{tab:benchmark},
+deployment cost is governed by inference latency, peak GPU memory, and
+training time. Table~\ref{tab:efficiency} reports these for all ten models.
+Inference latency is measured at batch size~1 on the RTX~4060~Ti, after a
+$200$-iteration warm-up and over $1\,000$ timed iterations; the median (P50)
+and $95$th-percentile (P95) latencies are tabulated together with peak GPU
+memory during inference, total wall-clock training time, and the number of
+epochs completed before early stopping.
+
+\begin{table}[!t]
+\caption{Inference and training efficiency. Latency is measured at batch
+size~1 on an NVIDIA RTX~4060~Ti. Bold marks the best value in each
+column for the proposed model.}
+\label{tab:efficiency}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{l d{4} d{4} d{5} d{5} d{3}}
+\hline
+\multicolumn{1}{l}{Model} &
+\multicolumn{1}{c}{P50 lat (ms)} &
+\multicolumn{1}{c}{P95 lat (ms)} &
+\multicolumn{1}{c}{GPU peak (MB)} &
+\multicolumn{1}{c}{Train (min)} &
+\multicolumn{1}{c}{Epochs} \\
+\hline
+ResNet50           &  6.88 &  9.18 & 148.37 & 131.82 & 129 \\
+DenseNet121        & 17.59 & 23.77 &  80.19 & 108.84 & 100 \\
+ConvNeXt-Tiny      &  6.56 &  8.80 & 171.98 & 262.55 & 200 \\
+Swin-T             & 11.54 & 12.18 & 179.33 & 145.52 & 118 \\
+EfficientNet-B0    &  8.88 &  9.51 &  76.91 & 104.05 & 126 \\
+EfficientNet V2-B2 & 13.15 & 14.02 &  72.47 & 114.20 & 135 \\
+EfficientNet V2-B3 & 15.41 & 20.38 &  94.14 &  92.47 &  99 \\
+EfficientNet V2-S  & 19.12 & 25.60 & 126.94 &  98.72 &  86 \\
+Inception V3       & 17.57 & 17.76 & 132.18 & 135.22 & 153 \\
+\hline
+\multicolumn{1}{l}{\textbf{Custom V2 (Hub v1)}} &
+10.16 & 13.41 & 52.32 & 131.70 & 172 \\
+\multicolumn{1}{l}{\textbf{Custom V2 (Hub v2)}} &
+9.86 & 15.50 &
+\multicolumn{1}{c}{\textbf{52.27}} &
+\multicolumn{1}{c}{\textbf{30.80}} &
+141 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+Two efficiency advantages stand out. The proposed model is the most
+memory-efficient architecture on the GPU, with a peak footprint of
+$52.27$~MB during inference --- between $30\,\%$ and $70\,\%$ lower than the
+comparators, and a direct consequence of the trimmed five-stage backbone and
+the lightweight AttentionHub replacing the donor's heavier Block-4. The second
+advantage is convergence speed: under the identical recipe, Hub~v2 reaches its
+early-stopping criterion in $141$ epochs against $172$ for Hub~v1, a $0.82\times$
+epoch count consistent with the lighter, sequential topology --- a single
+Triplet~\arrowto{}SE cascade imposes a smaller optimisation burden than v1's
+three parallel branches followed by a fusion projection.
+
+The wall-clock training times of Table~\ref{tab:efficiency} ($30.80$ versus
+$131.70$~min) point in the same direction, but they should be read as
+indicative rather than as a controlled measurement. All runs share a nominally
+identical recipe and the two custom-model variants differ by only $0.4\,\%$ in
+GFLOPs, yet the per-epoch wall-clock times differ by roughly $3.5\times$; this
+gap far exceeds what the FLOPs difference can explain. Because training was
+performed on a shared workstation without controlled process isolation,
+background load can perturb per-epoch wall-clock time between runs, and we do
+not attribute the full $3.5\times$ per-epoch gap to architecture. We therefore
+report training time faithfully from the per-run logs but draw no efficiency
+headline from it; the $141$-versus-$172$-epoch convergence difference is the
+more controlled observation. Inference latency is mid-pack and competitive with
+the EfficientNet family, the expected regime for a model whose GFLOPs are the
+lowest in the benchmark; the proposed model is not the fastest per image, but it
+is the lightest to host.

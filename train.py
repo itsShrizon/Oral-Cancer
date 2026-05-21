@@ -39,6 +39,7 @@ from data.dataset import OralPathologyDataset, load_dataset1_split, load_dataset
 from models.architecture import MultiTaskOralClassifier
 from models.loss import MultiTaskLoss
 from engine.trainer import train_one_epoch, validate
+from utils.ablation import ABLATIONS, branches_for, run_name_for
 
 # ?? Custom EfficientNetV2 training hyper-parameters (from colab) ??????????
 _CUSTOM_LR            = 1e-3
@@ -89,9 +90,35 @@ def main():
                              'warmup/AMP/clip/Kaiming/ES=25). "baseline" = forces the '
                              'standard 8-model recipe even for the custom model '
                              '(ablation for fair comparison).')
+    parser.add_argument('--ablation', type=str, default=None,
+                        choices=sorted(ABLATIONS.keys()),
+                        help='AttentionHub ablation (custom_efficientnet_v2 only). '
+                             'Forces --recipe baseline for fairness. "none" replaces '
+                             'the hub with the donor EfficientNetV2-B0 Block-4 (no-attention '
+                             'control). "full" is the proposed model.')
+    parser.add_argument('--hub-version', type=str, default='v1',
+                        choices=['v1', 'v2'],
+                        help='AttentionHub variant (custom_efficientnet_v2 only). '
+                             'v1 = parallel BAM/Triplet/KAN concat-fuse (default, '
+                             'compatible with --ablation). v2 = sequential '
+                             'Triplet->EMA cascade with LayerScale gates (informed '
+                             'by ablation; forces --recipe baseline).')
     args = parser.parse_args()
     current_backbone = args.backbone
     recipe = args.recipe
+    ablation = args.ablation
+    hub_version = args.hub_version
+    if hub_version == 'v2':
+        if ablation is not None:
+            raise SystemExit("--hub-version v2 is incompatible with --ablation")
+        if recipe != 'baseline':
+            print(f"NOTE: --hub-version v2 forces --recipe baseline (was {recipe!r}).")
+        recipe = 'baseline'
+    if ablation is not None:
+        # Ablations are only meaningful under the fair (baseline) recipe.
+        if recipe != 'baseline':
+            print(f"NOTE: --ablation forces --recipe baseline (was {recipe!r}).")
+        recipe = 'baseline'
 
     accum_steps = _GRAD_ACCUM_OVERRIDES.get(current_backbone, 1)
     print(f"Using Backbone: {current_backbone} | Recipe: {recipe} | "
@@ -104,12 +131,8 @@ def main():
     is_custom_arch = (current_backbone == 'custom_efficientnet_v2')
     is_custom      = is_custom_arch and (recipe == 'tuned')
 
-    # Append a suffix when running the baseline-recipe ablation on the custom
-    # model so the tuned results in results/custom_efficientnet_v2/ are not
-    # overwritten.
-    run_name = current_backbone
-    if is_custom_arch and recipe == 'baseline':
-        run_name = f"{current_backbone}_baseline_recipe"
+    # Resolve the per-run results folder name (handles recipe + ablation + hub).
+    run_name = run_name_for(current_backbone, ablation, recipe, hub_version=hub_version)
 
     # Paths
     current_save_dir       = os.path.join(config.BASE_PATH, 'results', run_name)
@@ -133,14 +156,20 @@ def main():
         transform=val_transform)
 
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True,
-                              num_workers=NUM_WORKERS, pin_memory=True)
+                              num_workers=NUM_WORKERS, pin_memory=True,
+                              persistent_workers=(NUM_WORKERS > 0))
     val_loader   = DataLoader(val_ds,   batch_size=BATCH_SIZE, shuffle=False,
-                              num_workers=NUM_WORKERS, pin_memory=True)
+                              num_workers=NUM_WORKERS, pin_memory=True,
+                              persistent_workers=(NUM_WORKERS > 0))
 
     print(f"Train: {len(train_ds)} | Val: {len(val_ds)}")
 
     # ?? Model ?????????????????????????????????????????????????????????????
-    model = MultiTaskOralClassifier(backbone=current_backbone).to(device)
+    model = MultiTaskOralClassifier(
+        backbone=current_backbone,
+        attention_branches=branches_for(ablation) if ablation is not None else None,
+        hub_version=hub_version,
+    ).to(device)
 
     if is_custom:
         # Kaiming init for the custom attention hub + classification heads
@@ -266,6 +295,10 @@ def main():
     eval_cmd = f"  python evaluate_final.py --backbone {current_backbone}"
     if is_custom_arch and recipe == 'baseline':
         eval_cmd += " --recipe baseline"
+    if hub_version == 'v2':
+        eval_cmd += " --hub-version v2"
+    if ablation is not None:
+        eval_cmd += f" --ablation {ablation}"
     print(eval_cmd)
     print("=" * 60)
 
@@ -273,6 +306,8 @@ def main():
     training_metrics = {
         'backbone': current_backbone,
         'recipe': recipe,
+        'hub_version': hub_version,
+        'ablation': ablation,
         'total_training_time_s': round(total_training_time, 2),
         'total_training_time_min': round(total_training_time / 60, 2),
         'epochs_completed': epoch + 1,

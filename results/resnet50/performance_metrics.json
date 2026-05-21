@@ -1,8 +1,8 @@
 {
   "backbone": "resnet50",
   "model_size_mb": 98.011,
-  "flops_raw": 8178476032,
-  "flops_gflops": 8.178,
+  "flops_raw": 4133796352,
+  "flops_gflops": 4.134,
   "num_parameters": 25610825,
   "batch_time_ms": 48.93,
   "estimated_epoch_time_s": 2.642,
@@ -23,5 +23,5 @@
     "p95_ms": 9.178,
     "p99_ms": 9.622
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }

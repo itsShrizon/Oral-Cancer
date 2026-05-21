@@ -1,9 +1,9 @@
 {
   "backbone": "swin_t",
   "model_size_mb": 108.07,
-  "flops_raw": 6771729408,
-  "flops_gflops": 6.772,
-  "num_parameters": 28311427,
+  "flops_raw": 4371874848,
+  "flops_gflops": 4.372,
+  "num_parameters": 28288105,
   "batch_time_ms": 63.558,
   "estimated_epoch_time_s": 3.432,
   "inference_time_ms_mean": 11.522,
@@ -23,5 +23,5 @@
     "p95_ms": 12.184,
     "p99_ms": 15.38
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }

@@ -1,0 +1,54 @@
+\section{Preliminaries and Notation}\label{sec:prelim}
+
+For clarity, this section fixes the notation used throughout the methodology
+and defines the attention role taxonomy on which the ablation study rests.
+
+\subsection{Notation}
+
+Let $x \in \mathbb{R}^{B \times 3 \times H \times W}$ denote a mini-batch of
+input images at resolution $H \times W = 224 \times 224$ and batch size $B$. A
+backbone network $f_\theta$ maps $x$ to a feature representation
+$F = f_\theta(x) \in \mathbb{R}^{B \times D}$, where $D$ is the backbone's
+feature dimensionality ($D = 192$ for the proposed model). Two linear heads
+$g_{\mathrm{binary}}$ and $g_{\mathrm{subtype}}$ produce class logits
+\begin{equation}
+  \hat{y}_b = g_{\mathrm{binary}}(F) \in \mathbb{R}^{B \times 2}, \qquad
+  \hat{y}_s = g_{\mathrm{subtype}}(F) \in \mathbb{R}^{B \times 7}.
+\end{equation}
+
+Ground-truth labels are denoted $y_b \in \{0,1\}^{B}$ (benign / malignant) and
+$y_s \in \{0,1,\dots,6,-1\}^{B}$, where the sentinel value $y_s = -1$ encodes
+``subtype unavailable'' for samples drawn from the binary-only dataset (DS1).
+The two heads are trained jointly with a single optimizer; the subtype loss is
+masked whenever $y_s = -1$, so that DS1 samples contribute to the binary loss
+only. The masking mechanism is detailed in Section~\ref{sec:methods}.
+
+\subsection{Attention Modules and the Role Taxonomy}
+
+An \emph{attention module} is any function
+$A : \mathbb{R}^{B \times C \times H \times W} \rightarrow
+\mathbb{R}^{B \times C \times H \times W}$ that reweights its input feature map
+in a content-dependent manner, where $C$ is the channel count and
+$H \times W$ is the spatial extent at the module's stage. We classify attention
+modules by their \emph{operational role} --- the axis or axes of the feature
+tensor that the module modulates:
+
+\begin{itemize}
+  \item \textbf{Spatial role.} The module modulates the $(H, W)$ plane,
+  reweighting locations within the feature map. The modules used in this study
+  that exercise a spatial role are the spatial gate of BAM, the
+  cross-dimensional gates of Triplet Attention, and the multi-scale spatial
+  branch of EMA.
+  \item \textbf{Channel role.} The module modulates the channel axis $C$ via a
+  globally pooled statistic, reweighting feature channels uniformly across
+  space. The channel-role modules used in this study are SE, KAN-Attention,
+  and the channel gate of BAM.
+  \item \textbf{Mixed role.} The module's internal design exercises both the
+  spatial and the channel axes simultaneously. BAM (whose channel and spatial
+  gates are summed) and EMA are the mixed-role modules used in this study.
+\end{itemize}
+
+This role taxonomy is the technical foundation of the role-complementarity
+principle developed in Section~\ref{sec:ablation}: the ablation results are
+interpreted not by which named modules are present, but by which functional
+roles the active modules collectively exercise.

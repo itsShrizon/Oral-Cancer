@@ -1,0 +1,165 @@
+\section{Related Work}\label{sec:related}
+
+Recent advances in artificial intelligence and image-based analysis have
+substantially expanded the diagnostic capabilities of oral health systems.
+CNNs and, more recently, Transformer-based architectures have demonstrated
+strong performance on a range of oral lesion classification and cancer
+detection tasks. The existing literature, however, is heavily skewed toward two
+narrow problem formulations: binary malignant-versus-benign discrimination, and
+detection of a single dominant disease category. Multi-class classification of
+clinically heterogeneous oral conditions remains comparatively under-explored,
+despite its closer alignment with real screening practice. Compounding this,
+most reported architectures inherit attention modules and hyper-parameters from
+generic benchmarks without systematic ablation, and few studies pair their
+quantitative results with explainability evidence that the model attends to
+clinically relevant tissue. Object-detection frameworks have been adapted for
+lesion localization but produce only bounding boxes and do not characterize
+sub-class identity, while a separate line of work targets pixel-level
+segmentation. Both directions are valuable but address questions
+orthogonal to the multi-class diagnostic categorization that the present study
+targets. The following subsections review each strand in turn and then
+position the present work against the gaps that emerge.
+
+\subsection{Binary Oral Cancer Detection}
+
+A substantial body of work has approached oral cancer as a binary screening
+problem. The CNN-based framework reported by Jubair \emph{et al.}~\cite{ref5}
+used transfer learning to compensate for limited clinical data and reported
+approximately $85\,\%$ classification accuracy (with a $95\,\%$ confidence
+interval of $81$--$90\,\%$) between malignant and non-malignant lesions,
+demonstrating discriminative capacity sufficient for screening. The binary
+formulation, however, precludes sub-type differentiation, and the model does
+not characterize lesion morphology.
+
+Subsequent efforts have prioritized computational efficiency. The SE-MobileViT
+architecture~\cite{ref16} integrates Squeeze-and-Excitation modules into a
+MobileViT backbone for channel-wise attention, achieving $98.39\,\%$ binary
+accuracy with reduced inference cost suitable for mobile deployment. The same
+trade-off applies: the model establishes the presence or absence of malignancy
+but does not differentiate among clinically distinct oral conditions.
+
+A complementary direction has combined hand-crafted and learned
+representations. The fusion of Local Binary Pattern (LBP) descriptors with deep
+CNN features has also been explored for oral cancer detection~\cite{ref17}. The
+contribution remains at the representation level --- the model still maps each
+image to a binary outcome.
+
+Across this family of methods, the dominant limitation is not accuracy but
+scope. Binary screening is insufficient when downstream clinical decisions
+depend on identifying which oral condition is present, since ulcerative,
+inflammatory, and neoplastic lesions warrant distinct management pathways.
+
+\subsection{Recurrent Aphthous Ulcer-Focused Models}
+
+A smaller body of work has targeted recurrent aphthous ulcer (RAU)
+specifically. The CNN-based framework reported in~\cite{ref3} used transfer
+learning with ResNet variants to distinguish ulcer and non-ulcer classes on a
+modest clinical dataset, achieving above $85\,\%$ accuracy. While the result
+demonstrates feasibility under data-scarce conditions, the formulation is
+binary and the small dataset constrains generalization to broader oral disease
+populations.
+
+A recent systematic review by Tiwari \emph{et al.}~\cite{ref23} surveyed $23$
+artificial-intelligence studies on the diagnosis of mouth ulcers --- spanning
+oral lichen planus (OLP), recurrent aphthous stomatitis, leukoplakia, and
+related conditions --- and reported accuracies ranging from $71\,\%$ to
+$100\,\%$ depending on dataset size and architecture choice. The review
+highlights two persistent gaps: limited class balance across datasets, and the
+near-absence of explainability evidence. These gaps directly motivate the dual
+emphasis of the present study on multi-class differentiation and visual
+interpretability.
+
+\subsection{Semantic Segmentation of Oral Lesions}
+
+A complementary line of research has approached oral lesions as a pixel-level
+or instance-level segmentation problem. The CLASEG framework~\cite{ref15}
+addresses differential diagnosis of oral lesions across $14$ lesion classes by
+coupling an EfficientNet-B3 classifier with a ResNet-101-based Mask R-CNN
+instance-segmentation branch; it reports a classification accuracy of
+$74.49\,\%$ and a segmentation $\mathrm{AP}_{50}$ of $72.18$. The work
+demonstrates that joint classification and lesion delineation is feasible over
+a broad lesion taxonomy, although the moderate classification accuracy
+indicates that fine-grained discrimination among many visually similar classes
+remains difficult.
+
+A more recent hybrid CNN-Transformer design~\cite{ref26} integrates high-order
+focus convolution with edge-aware modules and introduces Sobel-based edge
+enhancement to improve boundary delineation. The proposed model, HF-UNet, is
+trained on a curated oral-ulcer dataset and reaches a Dice score near $0.80$,
+with limited dataset size identified as the principal constraint on further
+gains.
+
+Segmentation and classification address different clinical questions:
+segmentation localizes lesion extent at pixel or instance granularity, whereas
+classification identifies the disease class. The present work focuses on the
+latter, where multi-class differentiation among visually similar conditions
+remains the dominant challenge.
+
+\subsection{Multi-Class Oral Disease Classification}
+
+The closest prior work to the present study is multi-class oral disease
+classification. Rashid \emph{et al.}~\cite{ref19} reported a strong single-model
+result, classifying a seven-class oral disease dataset of intraoral images with
+an InceptionResNetV2 network under a unified preprocessing protocol, reporting
+approximately $99.5\,\%$ accuracy and emphasizing generalization across patient
+demographics. While the result indicates that high-accuracy multi-class oral
+disease classification is attainable, the study treats backbone selection as
+the principal design axis and does not investigate how attention mechanisms
+should be integrated within the backbone. We note that this single-model
+literature result reports a subtype accuracy comparable to the figure obtained
+here on a related oral disease collection; accordingly, every claim of a
+``highest subtype accuracy'' in this paper is scoped to the controlled
+nine-baseline benchmark trained from scratch under one matched recipe, and is
+never advanced as a record against the broader literature.
+
+A related ensemble line of work, reported as MODC-SET~\cite{ref22}, combines
+MobileNetV2, InceptionResNetV2, and ResNet50 with an XGBoost meta-classifier and
+is evaluated on a separately curated collection of seven oral disease
+categories, where it is reported to reach roughly $99\,\%$ overall accuracy with
+feature fusion aiding discrimination between visually similar lesions. The
+architectural choices --- which backbones to ensemble, and why XGBoost as the
+meta-classifier --- are not subjected to ablation, and the substantial
+cumulative parameter count of the combined model raises practical deployment
+concerns. Because that work is evaluated on a different seven-class collection,
+it does not constitute a controlled comparator for the present study; we cite
+it only to situate the magnitude of multi-class results in the literature. The
+present study addresses the orthogonal question of how an efficient
+single-model alternative can be designed in a principled, ablation-driven way.
+
+\subsection{Transformer and Hybrid Architectures}
+
+Vision Transformer (ViT) architectures have also been explored for oral lesion
+analysis. Chilet-Martos \emph{et al.}~\cite{ref18} compared a ViT-based pipeline
+--- combining DETR, the Segment Anything Model, and a ViT classifier ---
+against radiomics-based baselines, with the ViT pipeline reaching an accuracy of
+approximately $0.93$; the study is framed primarily as a model-type comparison
+between deep representation learning and hand-crafted radiomic features.
+Hybrid CNN-Transformer designs that couple a DeiT branch with a CoAtNet branch
+have also been explored for image-based disease classification~\cite{ref21},
+typically taking the hybrid attention configuration as given rather than testing
+it through ablation. A distinct line of work has explored multimodal large
+language models as diagnostic assistants --- the evaluation in~\cite{ref24}
+tested ChatGPT-5's ability to differentiate OLP, oral lichenoid lesions, and
+squamous-cell carcinoma developing over lichen planus on biopsy-confirmed cases,
+finding competitive but sub-expert performance that lagged human experts at the
+Top-1 differential. That framework emphasizes diagnostic reasoning over spatial
+precision and complements rather than replaces dedicated vision models.
+
+\subsection{Position of the Present Work}
+
+The literature reviewed above reveals three gaps that motivate the present
+study. \emph{First}, binary formulations dominate; the few multi-class systems
+that exist~\cite{ref19,ref22} do not subject their architectural decisions to
+ablation. \emph{Second}, attention modules are stacked without principled
+justification --- the literature offers no empirically grounded rule for how
+attention components should be combined on this distribution. \emph{Third},
+explainability evidence in the multi-class oral disease setting is sparse,
+leaving the field's high-accuracy claims clinically unverified.
+
+The present work addresses all three gaps. We propose a parameter-efficient
+backbone with a novel AttentionHub module whose design is derived from a
+seven-cell ablation rather than imported from a generic benchmark; we benchmark
+it against nine standard CNN and Transformer baselines under a single matched
+training recipe with all models trained from scratch; and we accompany every
+model with Grad-CAM++ and LIME panels for both the binary and the seven-class
+heads.

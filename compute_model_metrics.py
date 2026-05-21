@@ -86,6 +86,7 @@ from utils.common import set_seed, get_device
 from data.transforms import val_transform
 from data.dataset import OralPathologyDataset, load_dataset1_split, load_dataset2_split
 from models.architecture import MultiTaskOralClassifier
+from utils.ablation import ABLATIONS, branches_for, run_name_for
 
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406])
 IMAGENET_STD  = np.array([0.229, 0.224, 0.225])
@@ -584,17 +585,30 @@ def main():
                         choices=['tuned', 'baseline'],
                         help='Which trained checkpoint folder to read from. Must match '
                              'the recipe used during training.')
+    parser.add_argument('--ablation', type=str, default=None,
+                        choices=sorted(ABLATIONS.keys()),
+                        help='Which AttentionHub ablation checkpoint to evaluate '
+                             '(custom_efficientnet_v2 only). Forces --recipe baseline.')
+    parser.add_argument('--hub-version', type=str, default='v1',
+                        choices=['v1', 'v2'],
+                        help='AttentionHub variant. v2 = sequential Triplet->EMA.')
     parser.add_argument('--skip-gradcam', action='store_true', help='Skip GradCAM')
     parser.add_argument('--skip-shap',    action='store_true', help='Skip SHAP')
     args = parser.parse_args()
 
     backbone_name  = args.backbone
     recipe         = args.recipe
+    ablation       = args.ablation
+    hub_version    = args.hub_version
+    if hub_version == 'v2':
+        if ablation is not None:
+            raise SystemExit("--hub-version v2 is incompatible with --ablation")
+        recipe = 'baseline'
+    if ablation is not None:
+        recipe = 'baseline'
     is_custom_arch = (backbone_name == 'custom_efficientnet_v2')
 
-    run_name = backbone_name
-    if is_custom_arch and recipe == 'baseline':
-        run_name = f"{backbone_name}_baseline_recipe"
+    run_name = run_name_for(backbone_name, ablation, recipe, hub_version=hub_version)
 
     save_dir       = os.path.join(config.BASE_PATH, 'results', run_name)
     model_path     = os.path.join(save_dir, 'best_model.pth')
@@ -624,11 +638,16 @@ def main():
 
     # Load model
     print(f"\nLoading model from {model_path}...")
-    model = MultiTaskOralClassifier(backbone=backbone_name).to(device)
+    model = MultiTaskOralClassifier(
+        backbone=backbone_name,
+        attention_branches=branches_for(ablation) if ablation is not None else None,
+        hub_version=hub_version,
+    ).to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
-    metrics = {'backbone': backbone_name, 'recipe': recipe, 'run_name': run_name}
+    metrics = {'backbone': backbone_name, 'recipe': recipe, 'run_name': run_name,
+               'ablation': ablation}
 
     # ?? 1. Model size ??????????????????????????????????????????????????????
     print("\n[1/8] Model size...")

@@ -1,0 +1,29 @@
+{
+  "backbone": "custom_efficientnet_v2",
+  "recipe": "baseline",
+  "run_name": "custom_efficientnet_v2_ablation_triplet",
+  "ablation": "triplet",
+  "model_size_mb": 18.89,
+  "flops_raw": 490506136,
+  "flops_gflops": 0.491,
+  "num_parameters": 4777597,
+  "batch_time_ms": 29.32,
+  "estimated_epoch_time_s": 1.583,
+  "inference_time_ms_mean": 8.75,
+  "inference_time_ms_std": 0.39,
+  "gpu_peak_mb": 52.22,
+  "cpu_rss_mb": 1446.5,
+  "carbon_emission_kg_co2": 0.00020606,
+  "energy_kwh": 0.00029803,
+  "energy_source": "codecarbon",
+  "latency_distribution": {
+    "mean_ms": 9.909,
+    "std_ms": 2.27,
+    "min_ms": 8.452,
+    "max_ms": 19.088,
+    "p50_ms": 8.679,
+    "p90_ms": 13.454,
+    "p95_ms": 13.661,
+    "p99_ms": 17.453
+  }
+}

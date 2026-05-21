@@ -1,9 +1,9 @@
 {
   "backbone": "convnext_tiny",
   "model_size_mb": 109.22,
-  "flops_raw": 8911108608,
-  "flops_gflops": 8.911,
-  "num_parameters": 28612201,
+  "flops_raw": 4455592704,
+  "flops_gflops": 4.456,
+  "num_parameters": 28589257,
   "batch_time_ms": 47.327,
   "estimated_epoch_time_s": 2.556,
   "inference_time_ms_mean": 6.792,
@@ -23,5 +23,5 @@
     "p95_ms": 8.8,
     "p99_ms": 12.325
   },
-  "flops_source": "hook-based estimator (Conv2d+Linear MACs * 2)"
+  "flops_source": "thop"
 }
