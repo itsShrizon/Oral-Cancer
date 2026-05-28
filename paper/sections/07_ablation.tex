@@ -8,8 +8,8 @@ subtype task, but not \emph{why} its hub is built from a Triplet~\arrowto{}SE
 cascade rather than from any of the many attention configurations the
 literature would licence. This section answers that question. It reports the
 seven v1 ablation cells plus the no-attention control
-(Section~\ref{subsec:ablcells}), isolates a quantitative regularity --- the
-$98.36\,\%$ ceiling --- and abstracts it into a \emph{role-complementarity
+(Section~\ref{subsec:ablcells}), isolates a quantitative regularity (the
+$98.36\,\%$ ceiling), and abstracts it into a \emph{role-complementarity
 principle} (Section~\ref{subsec:principle}). A confirmatory negative result
 (Section~\ref{subsec:emaneg}) stress-tests the principle, after which the
 principle is shown to force the v2 design (Section~\ref{subsec:v1tov2}) and the
@@ -71,25 +71,25 @@ figure with the single exception of \texttt{bam\_triplet}. The single-branch
 parameters than the no-attention control ($4.78$~M versus $5.70$~M), because
 the donor's MBConv+SE block is heavier than a $1\times1$ channel-reduction
 projection followed by a near-parameter-free Triplet gate. Attention here is
-not merely additive --- it is additive \emph{and} cheaper.
+not merely additive; it is additive \emph{and} cheaper.
 
 \textbf{Finding~2: the \texttt{triplet\_kan} pair outperforms the full parallel
 triple.} Removing BAM from the v1 hub \emph{improves} both heads:
 binary accuracy rises from $99.06\,\%$ to $99.12\,\%$ and subtype accuracy from
 $99.21\,\%$ to $99.45\,\%$. The full triple, although still strong, is not the
-best v1 configuration --- a result obscured in the original proposal because
+best v1 configuration, a result obscured in the original proposal because
 the full triple was never ablation-tested before publication. This finding is
 the first concrete sign that adding a third branch can subtract performance.
 
 \textbf{Finding~3: pairing two spatial-role modules collapses subtype accuracy
 to a sub-baseline ceiling.} The \texttt{bam\_triplet} cell reaches only
-$98.36\,\%$ subtype accuracy --- well below the no-attention control
+$98.36\,\%$ subtype accuracy, well below the no-attention control
 ($98.85\,\%$) and well below either constituent module evaluated singly
 (\texttt{bam}: $99.09\,\%$; \texttt{triplet}: $99.39\,\%$). Both BAM and Triplet
 exercise a spatial role (Section~\ref{subsec:principle}), and their combination
 regresses \emph{beneath} the no-attention baseline rather than merely failing to
-help. By contrast, \texttt{bam\_kan} --- which pairs BAM with the purely
-channel-wise KAN --- reaches $99.15\,\%$ subtype, comfortably above the control.
+help. By contrast, \texttt{bam\_kan}, which pairs BAM with the purely
+channel-wise KAN, reaches $99.15\,\%$ subtype, comfortably above the control.
 The collapse is therefore specific to the spatial-role collision, not a generic
 consequence of adding a second module. Section~\ref{subsec:emaneg} shows that
 this same $98.36\,\%$ ceiling reappears in an independent configuration
@@ -102,8 +102,8 @@ conflict rather than a \texttt{bam\_triplet}-specific artefact.
 \caption{Binary and subtype accuracy across the eight AttentionHub-v1 ablation
 cells and the proposed v2 cascade. The dashed line marks the $98.36\,\%$
 role-conflict ceiling: the spatial-spatial pair \texttt{bam\_triplet} lands
-exactly on it, while every role-complementary configuration --- including
-\texttt{bam\_kan} --- sits above it.}
+exactly on it, while every role-complementary configuration, including
+\texttt{bam\_kan}, sits above it.}
 \label{fig:ablbars}
 \end{figure}
 
@@ -129,13 +129,13 @@ The principle is empirically supported, cell by cell, by
 Table~\ref{tab:ablation}:
 
 \begin{itemize}
-\item \texttt{bam\_triplet} --- BAM (mixed spatial+channel) and Triplet
+\item \texttt{bam\_triplet}: BAM (mixed spatial+channel) and Triplet
 (cross-dimensional spatial) \textbf{both exercise a spatial role}. Subtype
 $=98.36\,\%$ ($\times$).
-\item \texttt{bam\_kan} --- BAM (mixed spatial+channel) and KAN (purely channel)
+\item \texttt{bam\_kan}: BAM (mixed spatial+channel) and KAN (purely channel)
 \textbf{do not collide on the spatial axis}; only one module is spatial.
 Subtype $=99.15\,\%$ ($\checkmark$), above the no-attention control.
-\item \texttt{triplet\_kan} --- Triplet (cross-dimensional spatial) and KAN
+\item \texttt{triplet\_kan}: Triplet (cross-dimensional spatial) and KAN
 (purely channel) cover \textbf{disjoint roles}. Subtype $=99.45\,\%$
 ($\checkmark$).
 \end{itemize}
@@ -145,8 +145,8 @@ the diagonal holds the single-module results and the off-diagonal holds the
 pairs, with the spatial-spatial \texttt{bam\_triplet} cell appearing as the lone
 sub-baseline entry. The $98.36\,\%$ ceiling recurs across \texttt{bam\_triplet}
 and the independent Triplet+EMA configuration of
-Section~\ref{subsec:emaneg} --- two spatial-role collisions reached from
-different module sets --- which is the empirical signature of spatial-role
+Section~\ref{subsec:emaneg}, two spatial-role collisions reached from
+different module sets, which is the empirical signature of spatial-role
 conflict rather than of a single bad cell. Because that number sits
 \emph{below} the no-attention baseline of $98.85\,\%$, the failure mode is not
 simply that the second module is uninformative: the role conflict
@@ -162,8 +162,8 @@ qualitatively different outcome.
 subtype accuracy and the off-diagonal reports module-pair subtype accuracy.
 The spatial-spatial pair BAM with Triplet is highlighted as the role-conflict
 cell, regressing to the $98.36\,\%$ ceiling; the disjoint-role pair Triplet
-with KAN reaches $99.45\,\%$, and the mixed pair BAM with KAN --- only one
-spatial module --- reaches $99.15\,\%$, above the no-attention control.}
+with KAN reaches $99.45\,\%$, and the mixed pair BAM with KAN (only one
+spatial module) reaches $99.15\,\%$, above the no-attention control.}
 \label{fig:rolematrix}
 \end{figure}
 
@@ -175,20 +175,20 @@ competing explanations: that any second module degrades the hub, or that the
 failure is specific to this one module pair. To separate them we performed a
 non-ablation control: starting from \texttt{triplet\_kan}, we replaced KAN with
 EMA (Efficient Multi-scale Attention, a multi-scale spatial-and-channel module)
-and reorganised the hub into a sequential cascade --- the v2-EMA configuration.
+and reorganised the hub into a sequential cascade: the v2-EMA configuration.
 Because EMA exercises a spatial role, the role-complementarity principle
 predicts that v2-EMA will regress.
 
 The prediction held. The v2-EMA configuration reached $98.60\,\%$ binary and
-$98.36\,\%$ subtype accuracy --- inside the very same $98.36\,\%$ ceiling
+$98.36\,\%$ subtype accuracy, inside the very same $98.36\,\%$ ceiling
 produced by the \texttt{bam\_triplet} v1 cell. We report this as a documented
 negative result. It independently corroborates the role-complementarity finding
 from outside the v1 grid, and it rules out the competing explanation that
 ``any pair will do once a second module is added'': pairs do well when their
 roles are disjoint and regress to the ceiling when their roles collide,
 regardless of whether the colliding module is BAM or EMA. The $98.36\,\%$
-ceiling is thus reached twice, from two disjoint module sets --- BAM+Triplet
-within the v1 grid and Triplet+EMA outside it --- and in both cases by a pair of
+ceiling is thus reached twice, from two disjoint module sets (BAM+Triplet
+within the v1 grid and Triplet+EMA outside it), and in both cases by a pair of
 spatial-role modules. This convergence is the empirical signature of
 spatial-role conflict, and it rules out the competing explanation that any
 second module degrades the hub: \texttt{bam\_kan} and \texttt{triplet\_kan},
@@ -215,14 +215,14 @@ channel-specific idiosyncrasies; SE's two-layer $1\times1$ bottleneck, with far
 fewer free parameters, is much harder to over-fit.
 \item SE has been benchmarked extensively within CBAM and related
 sequential-attention frameworks~\cite{woo2018cbam}, providing a
-citation-grounded precedent for \emph{sequential} --- rather than parallel ---
+citation-grounded precedent for \emph{sequential}, rather than parallel,
 attention composition.
 \end{enumerate}
 
 The topology is changed from parallel to sequential, following the CBAM
 convention~\cite{woo2018cbam}: Triplet first refines spatial attention, and SE
 then refines the channel response of the already spatially attended features.
-No LayerScale and no per-module residual are used --- both attentions are
+No LayerScale and no per-module residual are used; both attentions are
 multiplicative gates that preserve input information without requiring an
 explicit skip connection.
 
@@ -235,8 +235,8 @@ head over \texttt{triplet\_kan} represents a ten-image correction on a
 $1\,646$-sample test set and is within single-run noise; we therefore present
 v2 as the principled design, not as a statistically distinguishable
 improvement over \texttt{triplet\_kan}. Figure~\ref{fig:progression} traces the
-full design journey --- from the no-attention control, through the full v1
-triple, to the best v1 cell, and finally to the v2 cascade --- with subtype
+full design journey, from the no-attention control, through the full v1
+triple, to the best v1 cell, and finally to the v2 cascade, with subtype
 accuracy rising monotonically along the path while the binary head stays inside
 its noise band.
 
@@ -251,7 +251,7 @@ binary head remains within single-run noise throughout.}
 \label{fig:progression}
 \end{figure}
 
-This entire chain --- ablation, principle, then v2 design --- is the central
+This entire chain (ablation, principle, then v2 design) is the central
 methodological contribution of the paper. It replaces the ``stack attention
 modules and report the best'' pattern common in the medical-imaging literature
 with a measurement-driven design rule that explains, rather than merely
@@ -293,12 +293,12 @@ GPU peak (MB)    & 72.47 & 132.18 & \multicolumn{1}{c}{\textbf{52.27}} \\
 
 Table~\ref{tab:proposed_vs_base} makes the trade-off explicit. The proposed
 model concedes $0.30$ percentage points of binary accuracy to
-EfficientNet~V2-B2 --- a margin already established as within single-run noise
-in Section~\ref{subsec:quant} --- and in exchange leads on subtype accuracy and
+EfficientNet~V2-B2, a margin already established as within single-run noise
+in Section~\ref{subsec:quant}, and in exchange leads on subtype accuracy and
 on every efficiency metric by a wide margin: half the parameters of
 EfficientNet~V2-B2 and a fifth of those of Inception~V3, under a quarter of
 Inception~V3's GFLOPs, and the smallest on-disk and GPU footprint of the three.
 The ablation-driven Triplet~\arrowto{}SE cascade is therefore not a marginal
-re-tuning of an existing design; it is the principled endpoint of a
+re-tuning of an existing design. It is the principled endpoint of a
 measurement-driven search, and it dominates the strongest baselines on the axes
 that matter for a parameter-efficient classifier.

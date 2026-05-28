@@ -5,6 +5,7 @@
 %
 % KEY MAP (alphabetical by key)
 % ----------------------------------------------------------------------------
+%  chandrashekar2021oral       — Oral Images Dataset / DS1 (Chandrashekar et al., Mendeley Data 2021)
 %  chattopadhyay2018gradcampp  — Grad-CAM++ (Chattopadhyay et al., WACV 2018)
 %  he2016resnet                — Deep Residual Learning / ResNet (He et al., CVPR 2016)
 %  hu2018se                    — Squeeze-and-Excitation Networks (Hu et al., CVPR 2018)
@@ -16,6 +17,7 @@
 %  misra2021triplet            — Triplet Attention (Misra et al., WACV 2021)
 %  ouyang2023ema               — Efficient Multi-Scale Attention / EMA (Ouyang et al., ICASSP 2023)
 %  park2018bam                 — BAM: Bottleneck Attention Module (Park et al., BMVC 2018)
+%  rashid2022mod               — Mouth and Oral Diseases (MOD) Dataset / DS2 (Rashid et al., Kaggle 2023)
 %  ref3                        — CNN-based RAU detection with transfer learning  [PLACEHOLDER]
 %  ref5                        — Lightweight CNN (EfficientNet-B0) oral cancer detection, ~90% acc (Jubair et al., 2022)
 %  ref15                       — CLASEG segmentation/classification framework (Al-Ali et al., Sci. Reports 2025)
@@ -474,4 +476,47 @@
   pages     = {20085},
   year      = {2024},
   doi       = {10.1038/s41598-024-69125-9}
+}
+
+% =============================================================================
+% PART D --- DATASET RELEASES (DS1, DS2)
+% Public oral lesion image collections combined in this study.
+% =============================================================================
+
+% ---- DS1 ---- Mendeley "Oral Images Dataset" (binary: benign / malignant) --
+% Chandrashekar et al., Mendeley Data V2, 2021. DOI: 10.17632/mhjyrn35p4.2
+% Licence: CC BY 4.0. Original folder: 165 benign + 158 malignant lesion
+% photographs collected with clinicians at hospitals and colleges across
+% Karnataka, India. Provides DS1 used for the binary head in this work.
+@misc{chandrashekar2021oral,
+  author       = {{Chandrashekar H. S.} and {Geetha Kiran A.} and {Murali S.}
+                  and {Dinesh M. S.} and {Nanditha B. R.}},
+  title        = {Oral Images Dataset},
+  year         = {2021},
+  publisher    = {Mendeley Data},
+  version      = {V2},
+  doi          = {10.17632/mhjyrn35p4.2},
+  howpublished = {\url{https://data.mendeley.com/datasets/mhjyrn35p4/2}},
+  note         = {Licence: CC~BY~4.0. Original (non-augmented) folder contains
+                  165 benign and 158 malignant oral lesion images collected in
+                  consultation with clinicians at hospitals and colleges across
+                  Karnataka, India.}
+}
+
+% ---- DS2 ---- Kaggle "Mouth and Oral Diseases (MOD)" (7-class subtype) -----
+% Rashid et al., Kaggle dataset release. Compiled from dental clinics in
+% Okara, Punjab, Pakistan and supplementary online sources. Class labels for
+% seven oral cavity diseases (CaS, CoS, Gum, MC, OC, OLP, OT) contributed by
+% expert dental practitioners. The Kaggle landing page asks users to cite the
+% companion publication Rashid et al., MTA 2024 (see \cite{ref19}).
+@misc{rashid2022mod,
+  author       = {Rashid, Javed and Qaisar, Bilal Shabbir and {Ul Amin}, Riaz},
+  title        = {Mouth and Oral Diseases ({MOD}) Dataset},
+  year         = {2023},
+  howpublished = {Kaggle Dataset, \url{https://www.kaggle.com/datasets/javedrashid/mouth-and-oral-diseases-mod}},
+  note         = {Compiled from dental clinics in Okara, Punjab, Pakistan and
+                  supplementary online sources. Class labels for seven oral
+                  cavity diseases (CaS, CoS, Gum, MC, OC, OLP, OT) contributed
+                  by expert dental practitioners. Companion publication:
+                  \cite{ref19}.}
 }

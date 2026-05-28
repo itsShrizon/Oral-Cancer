@@ -1,15 +1,15 @@
 \section{Introduction}\label{sec:intro}
 
-\IEEEPARstart{O}{ral} diseases --- including ulcerative, inflammatory, and
-neoplastic lesions --- present a complex visual challenge for automated
+Oral diseases, including ulcerative, inflammatory, and
+neoplastic lesions, present a complex visual challenge for automated
 analysis. Conditions such as recurrent aphthous ulcer, oral lichen planus, and
 squamous-cell carcinoma can share overlapping colour, texture, and boundary
 cues at the image level, yet a single misclassification between a benign
 inflammatory lesion and an early malignancy carries materially different
 clinical consequences. A computer-aided diagnostic system must therefore solve
 two related but distinct problems: identifying \emph{whether} a lesion is
-malignant --- binary screening --- and identifying \emph{which} of several
-visually similar conditions is present --- multi-class subtyping. The second
+malignant (binary screening) and identifying \emph{which} of several
+visually similar conditions is present (multi-class subtyping). The second
 problem is the one that most directly governs the choice of downstream
 management pathway, and it is the focus of this paper.
 
@@ -19,24 +19,24 @@ results~\cite{ref5,ref16,ref17} and several promising multi-class
 systems~\cite{ref19,ref22}. Despite this progress, three persistent gaps remain
 in the literature.
 
-\emph{Gap~1 --- Binary formulations dominate.} Most published architectures
+\emph{Gap~1: Binary formulations dominate.} Most published architectures
 collapse oral pathology to a benign-versus-malignant decision. This formulation
 is clinically insufficient when downstream treatment depends on differentiating
 among multiple non-malignant conditions that visually mimic malignancy, since
 ulcerative, inflammatory, and neoplastic lesions warrant different management
 pathways.
 
-\emph{Gap~2 --- Attention modules are stacked without ablation.} Modern
-backbones routinely embed attention components --- Squeeze-and-Excitation
+\emph{Gap~2: Attention modules are stacked without ablation.} Modern
+backbones routinely embed attention components such as Squeeze-and-Excitation
 (SE), the Convolutional Block Attention Module (CBAM), the Bottleneck Attention
 Module (BAM), Triplet Attention, Efficient Multi-scale Attention (EMA), and
-Kolmogorov-Arnold Network attention (KAN) --- yet their individual and combined
+Kolmogorov-Arnold Network attention (KAN), yet their individual and combined
 contributions in the oral-disease setting are rarely measured. The literature
 offers little guidance on which attention modules complement one another and
 which conflict, and proposed architectures tend to inherit attention designs
 from generic benchmarks rather than testing them on the target distribution.
 
-\emph{Gap~3 --- Explainability evidence is sparse.} Few multi-class oral
+\emph{Gap~3: Explainability evidence is sparse.} Few multi-class oral
 disease studies present visual attention maps that demonstrate the model
 attends to lesion tissue rather than to teeth, lip outlines, or lighting
 artifacts. Absent such evidence, it is difficult to argue that a high-accuracy
@@ -74,8 +74,8 @@ four contributions.
 Figure~\ref{fig:arch} previews the proposed architecture: a five-stage backbone
 whose fourth stage is the AttentionHub and whose pooled feature feeds two
 task-specific heads, one for the binary task and one for the seven-class
-subtype task. The architectural changes are deliberately minimal --- a single
-swapped stage and a trimmed tail --- so that the measured gains can be
+subtype task. The architectural changes are deliberately minimal (a single
+swapped stage and a trimmed tail) so that the measured gains can be
 attributed to the hub design rather than to a wholesale redesign of the
 network.
 

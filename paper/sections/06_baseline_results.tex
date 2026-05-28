@@ -1,8 +1,8 @@
 \section{Baseline Benchmark Results}\label{sec:results}
 
 This section establishes the empirical reference frame against which the
-proposed model is judged. Ten architectures --- the nine standard baselines and
-the proposed Custom EfficientNet~V2 --- are trained from scratch under the
+proposed model is judged. Ten architectures (the nine standard baselines and
+the proposed Custom EfficientNet~V2) are trained from scratch under the
 single matched recipe of Section~\ref{sec:methods}, with no per-model
 hyper-parameter tuning, and evaluated once on the held-out test set. The
 benchmark is reported along three axes: classification accuracy on both heads
@@ -79,13 +79,13 @@ than Inception~V3 ($23.9$~M), and $5.3\times$ smaller than ResNet50
 ($25.6$~M), with proportional reductions in GFLOPs. The proposed model is
 therefore not trading capacity for accuracy: among the nine baselines trained
 from scratch under the matched recipe, it strictly dominates every baseline in
-the subtype-accuracy versus parameter-count plane --- simultaneously the most
+the subtype-accuracy versus parameter-count plane, simultaneously the most
 accurate and the smallest.
 
 Figure~\ref{fig:pareto} makes this dominance explicit. Plotting subtype
 accuracy against parameter count on a logarithmic axis, the proposed model
-occupies the upper-left corner --- highest accuracy at the lowest parameter
-budget --- and lies on the Pareto frontier, while every heavier comparator sits
+occupies the upper-left corner (highest accuracy at the lowest parameter
+budget) and lies on the Pareto frontier, while every heavier comparator sits
 strictly below and to the right of it. Figure~\ref{fig:radar} extends the
 comparison to six axes, contrasting the proposed model against the two
 strongest baselines on binary accuracy, subtype accuracy, and four
@@ -99,7 +99,7 @@ extending far beyond them on every efficiency axis.
 \includegraphics[width=\columnwidth]{fig03_pareto_params}
 \caption{Subtype accuracy versus parameter count (logarithmic horizontal axis)
 for all ten architectures. The proposed Custom EfficientNet~V2 (Hub~v2) lies on
-the Pareto frontier in the upper-left region --- the highest subtype accuracy
+the Pareto frontier in the upper-left region, with the highest subtype accuracy
 at the smallest parameter budget. ConvNeXt-Tiny ($90.5\,\%$) falls below the
 plotted accuracy range and is marked separately.}
 \label{fig:pareto}
@@ -118,9 +118,9 @@ on parameter, FLOPs, size, and memory efficiency.}
 
 The binary head, by contrast, is effectively tied at the top of the table.
 EfficientNet~V2-B2 leads at $99.36\,\%$ and the proposed model follows at
-$99.06\,\%$. The binary head is evaluated on a $1\,711$-image test set --- the
+$99.06\,\%$. The binary head is evaluated on a $1\,711$-image test set (the
 DS1 test split together with the full DS2 test set, each image carrying a
-benign/malignant label --- on which the proposed model commits $16$ errors
+benign/malignant label) on which the proposed model commits $16$ errors
 (Section~\ref{subsec:perclass});
 the $0.30$ percentage-point gap to the leader is therefore a difference of
 roughly five images, well inside the noise band of a single training run. We
@@ -171,7 +171,7 @@ OT (210)  & \textbf{1.00 / 1.00 / 1.00} & 0.99 / 1.00 / 1.00 & 0.98 / 0.99 / 0.9
 \end{table}
 
 The proposed model's macro-averaged F1 is $0.99$, with no class falling below
-$0.99$ --- a uniformity that neither of the two strongest baselines exhibits.
+$0.99$, a uniformity that neither of the two strongest baselines exhibits.
 EfficientNet~V2-B2 and Inception~V3 each let a class slip to $0.98$ on at least
 one of the three reported metrics, whereas the proposed model holds the floor
 at $0.99$ across all seven classes.
@@ -181,7 +181,7 @@ single model, Table~\ref{tab:perclass_full} reports the full per-class
 precision~/ recall~/ F1 for every baseline together with the proposed model on
 the subtype head. Two clinically meaningful observations follow. First, the MC
 and OC columns are the only ones in which any model loses F1 below $1.00$, and
-the \emph{same} two columns are where every model loses --- the residual
+the \emph{same} two columns are where every model loses. The residual
 confusion is therefore data-driven rather than model-driven, a direct
 consequence of MC and OC both being malignant carcinomas with overlapping
 visual presentation. Second, the proposed model recovers a perfect
@@ -220,7 +220,7 @@ columns are all $1.00 / 1.00 / 1.00$. The residual confusion costs the model
 exactly two misclassified MC images and one misclassified OC image, out of
 supports of $288$ and $173$ respectively. Figure~\ref{fig:heatmap} renders the
 same per-class F1 values as a model~$\times$~class heat map; what the heat map
-adds over Table~\ref{tab:perclass_full} is the visual gestalt --- the MC and OC
+adds over Table~\ref{tab:perclass_full} is the visual gestalt: the MC and OC
 columns form a single coherent cool band spanning every one of the ten models
 at once, making the data-driven nature of the residual confusion legible at a
 glance in a way a tabulated grid of numbers does not, while the proposed
@@ -229,9 +229,9 @@ presents the binary and subtype confusion matrices for the proposed model. The
 subtype matrix is computed over the $1\,646$-image DS2 test set and the binary
 matrix over the $1\,711$-image binary test set, so that both denominators are
 verifiable. The binary matrix shows $11$ benign images predicted malignant and
-$5$ malignant images predicted benign --- $16$ errors in $1\,711$ images,
+$5$ malignant images predicted benign ($16$ errors in $1\,711$ images,
 consistent with the $99.06\,\%$ binary accuracy reported in
-Table~\ref{tab:benchmark} --- and the subtype matrix confirms that every
+Table~\ref{tab:benchmark}), and the subtype matrix confirms that every
 off-diagonal entry is concentrated in the MC and OC rows, with all other
 classes perfectly resolved.
 
@@ -307,12 +307,12 @@ Inception V3       & 17.57 & 17.76 & 132.18 & 135.22 & 153 \\
 
 Two efficiency advantages stand out. The proposed model is the most
 memory-efficient architecture on the GPU, with a peak footprint of
-$52.27$~MB during inference --- between $30\,\%$ and $70\,\%$ lower than the
+$52.27$~MB during inference, between $30\,\%$ and $70\,\%$ lower than the
 comparators, and a direct consequence of the trimmed five-stage backbone and
 the lightweight AttentionHub replacing the donor's heavier Block-4. The second
 advantage is convergence speed: under the identical recipe, Hub~v2 reaches its
 early-stopping criterion in $141$ epochs against $172$ for Hub~v1, a $0.82\times$
-epoch count consistent with the lighter, sequential topology --- a single
+epoch count consistent with the lighter, sequential topology: a single
 Triplet~\arrowto{}SE cascade imposes a smaller optimisation burden than v1's
 three parallel branches followed by a fusion projection.
 

@@ -11,19 +11,26 @@ ablation rather than an unverified assertion.
 
 \subsection{Dataset}\label{ssec:dataset}
 
-The experimental data combine two complementary sources that together
-support the dual-task formulation. \emph{Dataset~1} (DS1) provides binary
-supervision: a curated collection of oral lesion photographs labelled as
-benign or malignant, used to drive the binary head of the classifier.
-\emph{Dataset~2} (DS2) provides seven-way subtype supervision across the
-seven classes \textbf{CaS}, \textbf{CoS}, \textbf{Gum}, \textbf{MC},
-\textbf{OC}, \textbf{OLP}, and \textbf{OT}, as labelled in the source
-dataset; we retain the dataset's class abbreviations verbatim rather than
-assigning clinical expansions that the source release does not document.
-Within DS2, the subset $\{\text{MC},\text{OC},\text{CaS}\}$ is taken to
-denote the malignant subtypes, and the remaining four classes the
-non-malignant subtypes, for the purpose of constructing binary supervision
-when DS2 images are read into the binary head. Representative images for the two binary categories
+The experimental data combine two complementary, publicly released oral
+lesion image collections that together support the dual-task formulation.
+\emph{Dataset~1} (DS1) is the \emph{Oral Images Dataset} of
+Chandrashekar~\textit{et~al.}~\cite{chandrashekar2021oral} (Mendeley Data,
+\textsc{cc by}~4.0), a curated set of 165 benign and 158 malignant oral
+lesion photographs collected in consultation with clinicians at hospitals
+and colleges across Karnataka, India; it drives the binary head of the
+classifier. \emph{Dataset~2} (DS2) is the \emph{Mouth and Oral Diseases}
+(MOD) dataset of Rashid~\textit{et~al.}~\cite{rashid2022mod,ref19}
+(distributed via Kaggle), compiled from dental clinics in Okara, Punjab,
+Pakistan and supplementary online sources, providing seven-way subtype
+supervision across the classes \textbf{CaS}, \textbf{CoS}, \textbf{Gum},
+\textbf{MC}, \textbf{OC}, \textbf{OLP}, and \textbf{OT}, with labels
+contributed by expert dental practitioners; we retain the source
+dataset's class abbreviations verbatim rather than assigning clinical
+expansions that the release does not document. Within DS2, the subset
+$\{\text{MC},\text{OC},\text{CaS}\}$ is taken to denote the malignant
+subtypes, and the remaining four classes the non-malignant subtypes, for
+the purpose of constructing binary supervision when DS2 images are read
+into the binary head. Representative images for the two binary categories
 and the seven subtype classes are shown in Fig.~\ref{fig:dataset}; the
 visual overlap in colour, texture, and boundary cues across several
 subtypes motivates the multi-class formulation pursued here.
@@ -79,8 +86,8 @@ paper is informed by test-set performance.
 
 \subsection{Dual-Head Multi-Task Classifier}\label{ssec:dualhead}
 
-All ten architectures evaluated in this study --- nine baseline backbones
-and the proposed model --- share a common dual-head wrapper, denoted
+All ten architectures evaluated in this study (nine baseline backbones
+and the proposed model) share a common dual-head wrapper, denoted
 \texttt{MultiTaskOralClassifier}. A shared backbone produces a pooled
 feature vector, after which two independent multilayer perceptron (MLP)
 heads predict the binary class (2 logits) and the subtype class (7 logits).
@@ -111,10 +118,10 @@ other stage is retained verbatim from the EfficientNetV2-B0 reference so
 that the contribution of each change can be measured cleanly.
 
 \begin{enumerate}
-  \item \textbf{Stage-4 replacement.} The donor's Block-4 --- a Mobile
+  \item \textbf{Stage-4 replacement.} The donor's Block-4, a Mobile
   Inverted Bottleneck Convolution (MBConv) block fused with a
-  Squeeze-and-Excitation (SE) unit, mapping $96 \rightarrow 112$ channels
-  --- is removed and replaced by an \emph{AttentionHub}
+  Squeeze-and-Excitation (SE) unit mapping $96 \rightarrow 112$ channels,
+  is removed and replaced by an \emph{AttentionHub}
   (Section~\ref{ssec:hub}) with identical input and output channel counts.
   The hub is the only stage whose internal structure departs from the
   EfficientNetV2-B0 reference, and it is the only component the ablation of
@@ -126,10 +133,10 @@ that the contribution of each change can be measured cleanly.
   carried by the donor's wide convolutional head.
 \end{enumerate}
 
-The resulting backbone comprises five stages --- \emph{Stem${}+{}$Block-0
+The resulting backbone comprises five stages: \emph{Stem${}+{}$Block-0
 ${}+{}$Block-1} (32 channels) $\rightarrow$ \emph{Block-2} (48)
 $\rightarrow$ \emph{Block-3} (96) $\rightarrow$ \emph{AttentionHub} (112)
-$\rightarrow$ \emph{Block-5} (192) --- followed by global average pooling
+$\rightarrow$ \emph{Block-5} (192), followed by global average pooling
 and the two heads. The complete model contains between 4.79~M and 4.80~M
 parameters and requires between 0.493 and 0.495 GFLOPs across the
 attention-bearing ablation variants reported in Section~\ref{sec:ablation};
@@ -163,8 +170,8 @@ $96 \rightarrow 112$ channel mapping of the block they replace.
 
 \paragraph{AttentionHub-v1 (parallel triple)}
 The originally proposed hub routes the Stage-3 output through three parallel
-attention branches --- Bottleneck Attention Module (BAM), Triplet Attention,
-and Kolmogorov--Arnold Network attention (KAN-Attention) --- each preceded
+attention branches: Bottleneck Attention Module (BAM), Triplet Attention,
+and Kolmogorov--Arnold Network attention (KAN-Attention). Each branch is preceded
 by a $1\times1$ channel-reduction projection that halves the branch channel
 count. The three branch outputs are concatenated and fused by a $1\times1$
 projection back to 112 channels. Ablation of v1 is implemented by removing
@@ -209,13 +216,13 @@ reduction ratio 16 and a sigmoid gate, and multiplies the result back into
 the input. No LayerScale, no per-module residual, and no additional gating
 are introduced: both attentions are multiplicative gates that preserve the
 input information without an explicit skip connection. The composition
-order --- spatial attention before channel attention --- follows the
+order, spatial attention before channel attention, follows the
 convention established by the Convolutional Block Attention Module
 (CBAM)~\cite{woo2018cbam}. The internal layout of the v2 hub is shown in
 Fig.~\ref{fig:hubv2}, and a side-by-side contrast with the v1 parallel hub
-is given in Fig.~\ref{fig:v1v2}. The design rationale for v2 --- in
+is given in Fig.~\ref{fig:v1v2}. The design rationale for v2 (in
 particular, why a sequential cascade is preferred over the v1 parallel
-fusion and why SE is chosen as the channel partner --- is not asserted here
+fusion and why SE is chosen as the channel partner) is not asserted here
 but \emph{derived} in Section~\ref{sec:ablation} from the v1 ablation.
 
 \begin{figure*}[!t]
@@ -240,7 +247,7 @@ but \emph{derived} in Section~\ref{sec:ablation} from the v1 ablation.
   cross-dimensional spatial gating, SE applies pure per-channel
   recalibration, and a $1\times1$ projection expands the result to 112
   channels for Stage~5. The two attention modules occupy disjoint functional
-  roles --- spatial and channel --- which Section~\ref{sec:ablation} shows is
+  roles (spatial and channel), which Section~\ref{sec:ablation} shows is
   the condition required to avoid the observed sub-baseline accuracy
   ceiling.}
   \label{fig:hubv2}
@@ -280,7 +287,7 @@ model: DS1 samples, which carry no subtype label, are assigned the sentinel
 subtype label $-1$ and therefore contribute only to the binary term, while
 DS2 samples contribute to both terms. A numerical guard converts any
 not-a-number (NaN) subtype loss to zero, so that a mini-batch composed
-exclusively of DS1 samples --- for which the subtype term is undefined ---
+exclusively of DS1 samples, for which the subtype term is undefined,
 remains a valid training step.
 
 The joint update is summarised in Algorithm~1, typeset in
@@ -322,7 +329,7 @@ through both $\mathcal{L}_b$ and $\mathcal{L}_s$.
 
 \subsection{Training Protocol}\label{ssec:training}
 
-All ten models --- the nine baseline backbones and the proposed model ---
+All ten models (the nine baseline backbones and the proposed model)
 are trained from scratch under a single matched recipe, deliberately chosen
 to guarantee a fair comparison. \textbf{No ImageNet pre-trained weights are
 used.} Pre-training would smuggle a representational prior into the
@@ -354,7 +361,7 @@ reintroducing exactly the kind of uncontrolled variable that a fair
 benchmark must eliminate. Where a baseline encounters memory pressure on the
 16~GB GPU, the correct response under this protocol is gradient
 accumulation at a fixed effective batch size, not a per-model
-hyper-parameter override --- a stance established by prior fair-comparison
+hyper-parameter override, a stance established by prior fair-comparison
 work and retained here as a methodological commitment rather than a
 convenience.
 
@@ -380,8 +387,8 @@ set.
   consistency with the comparison literature.} the mean and standard
   deviation of single-image
   inference latency (a 200-iteration warm-up followed by 1\,000 timed
-  iterations), the P50 / P90 / P95 / P99 latency percentiles --- of which
-  the P50 and P95 values are tabulated in Section~\ref{sec:results} ---
+  iterations), the P50 / P90 / P95 / P99 latency percentiles (of which
+  the P50 and P95 values are tabulated in Section~\ref{sec:results}),
   energy in kWh and carbon in kg~CO\textsubscript{2}-equivalent measured
   with \texttt{codecarbon} where available, total training time, and the
   number of epochs completed before early stopping.
@@ -404,7 +411,7 @@ $\{\text{bam},\text{triplet},\text{kan}\}$, where the empty tuple falls
 back to the donor's original Block-4 and thus serves as the no-attention
 control. Because the switch operates inside the hub and changes nothing
 else in the network or the recipe, the eight cells differ from one another
-only in which attention branches are active --- the property required for
+only in which attention branches are active, the property required for
 the ablation to be causally interpretable. The eight cells are listed in
 Table~\ref{tab:ablkeys}, together with the functional role each
 configuration's hub exercises.
@@ -436,8 +443,8 @@ configuration's hub exercises.
   \end{tabularx}
 \end{table}
 
-In addition, we report a v2-EMA run --- a sequential Triplet${}+{}$Efficient
-Multi-scale Attention (EMA) cascade --- which is \emph{not} an ablation cell
+In addition, we report a v2-EMA run, a sequential Triplet${}+{}$Efficient
+Multi-scale Attention (EMA) cascade, which is \emph{not} an ablation cell
 but a deliberate stress test of the role-complementarity principle: it
 replaces SE with EMA, a module that combines a multi-scale spatial branch
 with a channel branch. Because EMA exercises a spatial role, the principle

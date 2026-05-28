@@ -2,24 +2,24 @@
 
 \subsection{What the Ablation Actually Proves}\label{subsec:what_ablation_proves}
 
-The headline subtype number --- 99.51\,\% --- is the easy story. The harder
+The headline subtype number, 99.51\,\%, is the easy story. The harder
 story, and the one we believe matters more for the field, is the
 \textbf{role-complementarity principle}. The \texttt{bam\_triplet} cell and the
-independent v2-EMA negative result --- two pairings of spatial-role attention
-modules reached from disjoint module sets --- converge on the same 98.36\,\%
+independent v2-EMA negative result, two pairings of spatial-role attention
+modules reached from disjoint module sets, converge on the same 98.36\,\%
 subtype ceiling, each falling below the no-attention control. It is unlikely
 that two independently trained spatial-spatial configurations would land on the
 same accuracy to four significant figures by chance; the probability of such a
 convergence under a pure-noise null is low. We do not over-read two data points,
 however: the more decisive evidence is mechanistic rather than combinatorial.
-Both configurations regress \emph{beneath} the no-attention control --- an
+Both configurations regress \emph{beneath} the no-attention control, an
 outcome a harmless redundant module could not produce, since an uninformative
 module would at worst leave the representation unchanged. The convergence is
 therefore better read as the signature of a systematic spatial-role conflict
 than as a coincidence, and the multi-seed follow-up of
 Section~\ref{subsec:future} is the proper remedy for the small sample. The
-contrast with \texttt{bam\_kan} --- BAM paired with the purely channel-wise KAN,
-99.15\,\% --- and with \texttt{triplet\_kan} (99.45\,\%) sharpens the point: a
+contrast with \texttt{bam\_kan} (BAM paired with the purely channel-wise KAN,
+99.15\,\%) and with \texttt{triplet\_kan} (99.45\,\%) sharpens the point: a
 non-spatial second module is complementary, a spatial one collides.
 
 The consequence is that the present paper contributes not only a model but a
@@ -58,8 +58,8 @@ the broader literature, where results obtained on different datasets and under
 different protocols are not directly comparable.
 
 Relative to the binary-screening literature~\cite{ref5,ref16,ref17}, the
-proposed model maintains binary-task parity --- 99.06\,\% against the leading
-EfficientNet~V2-B2 at 99.36\,\% --- at less than half the parameter count,
+proposed model maintains binary-task parity (99.06\,\% against the leading
+EfficientNet~V2-B2 at 99.36\,\%) at less than half the parameter count,
 while additionally delivering the seven-way subtype categorization that the
 binary screeners do not address. The comparison with the segmentation
 literature~\cite{ref15,ref26} is one of complementary scope rather than of
@@ -70,8 +70,8 @@ them.
 
 \subsection{Why the Binary Head Plateaus}\label{subsec:binary_plateau}
 
-Across the strongest baselines --- ResNet50, Inception~V3, and
-EfficientNet~V2-B2 --- the binary head sits within a narrow 99.1--99.4\,\%
+Across the strongest baselines (ResNet50, Inception~V3, and
+EfficientNet~V2-B2), the binary head sits within a narrow 99.1--99.4\,\%
 corridor. We interpret this as a property of the data rather than of the
 model: the visual gap between benign and malignant lesions is sufficiently wide
 that any reasonable backbone trained from scratch resolves it almost
@@ -80,8 +80,8 @@ dataset that admits harder edge cases or a task-targeted augmentation strategy;
 neither is in scope here, and we do not claim a binary-task improvement.
 
 The subtype head behaves differently. It requires the model to differentiate
-among visually similar mucosal conditions --- most notably MC versus OC, two
-malignant carcinomas whose presentations overlap --- and this is exactly where
+among visually similar mucosal conditions, most notably MC versus OC, two
+malignant carcinomas whose presentations overlap, and this is exactly where
 attention-hub design has measurable leverage. The role-complementarity
 principle yields its gain on the subtype head and not on the binary head
 because the subtype task is the one whose residual errors are
@@ -114,7 +114,7 @@ the ablation forces, and that under one matched run it sets the highest subtype
 number in the study.
 
 \emph{(b) Dataset scale.} The training set is approximately 5\,500 images
-across seven subtypes --- small relative to natural-image benchmarks, though
+across seven subtypes, small relative to natural-image benchmarks though
 large relative to most oral-disease studies. We compensate through from-scratch
 training (so that no ImageNet prior is smuggled in), augmentation, early
 stopping, and replicated evaluation, but external validation on independent
@@ -134,8 +134,8 @@ time" reported alongside them is an approximation.
 \emph{(e) Interpretability evidence is qualitative.} Section~\ref{sec:xai}
 presents Grad-CAM++ and LIME panels and a visual alignment ranking of the
 models, but the dataset carries no lesion masks and no quantitative
-interpretability metric --- for example deletion/insertion AUC or
-pointing-game accuracy against annotated regions --- is computed. The
+interpretability metric (for example deletion/insertion AUC or
+pointing-game accuracy against annotated regions) is computed. The
 cross-model interpretability ordering should therefore be read as indicative
 rather than as a measured, falsifiable result.
 
@@ -163,16 +163,16 @@ make such an evaluation tractable on commodity hardware, but the evaluation
 itself has not been performed here.
 
 \emph{(b) Decision-context gap.} The model produces a posterior over seven
-classes; clinical decisions require additional inputs --- history, palpation,
-biopsy result --- that the model does not consume. Any deployment must
+classes; clinical decisions require additional inputs (history, palpation,
+biopsy result) that the model does not consume. Any deployment must
 therefore be framed as \emph{decision-support} rather than
 \emph{decision-making}, with a clinician retaining final authority over
 diagnosis and management.
 
 \emph{(c) Calibration gap.} This work reports accuracy and F1 but does not
 report calibration metrics such as Expected Calibration Error or Brier score.
-For triage-style screening --- where the most useful output is often a
-calibrated probability that the lesion warrants biopsy --- calibration becomes
+For triage-style screening, where the most useful output is often a
+calibrated probability that the lesion warrants biopsy, calibration becomes
 more important than accuracy. We flag this as the most consequential metric the
 present study does not report, and we treat its evaluation as an open
 follow-up.
@@ -187,17 +187,17 @@ Five directions follow naturally from the present study.
 \begin{enumerate}
   \item \textbf{Third attention slot.} Extending the role-complementarity
   principle to a \emph{third} attention slot would require a new ablation grid
-  testing whether a third disjoint-role module --- for example a
+  testing whether a third disjoint-role module (for example a
   frequency-domain attention, a global-context module, or a graph-based
-  reasoning head --- compounds the gain or whether the cascade saturates at two
+  reasoning head) compounds the gain or whether the cascade saturates at two
   complementary modules. The principle as stated does not predict the answer.
   \item \textbf{Backbone transferability.} The v2 hub is small enough to drop
   into the larger EfficientNet~V2 family or into ResNet-style backbones;
   testing whether the same principle holds when Stage~4 sits inside a deeper or
   wider network would establish whether the rule is dataset-specific,
   architecture-specific, or general.
-  \item \textbf{Multi-seed statistical evaluation.} A multi-seed run --- for
-  example five independent random seeds per ablation cell --- would convert the
+  \item \textbf{Multi-seed statistical evaluation.} A multi-seed run (for
+  example five independent random seeds per ablation cell) would convert the
   present single-run table into a mean $\pm$ standard-deviation table, making
   within-cell variability explicit and supporting paired-sample significance
   tests between v2, \texttt{triplet\_kan}, and \texttt{full}. The principle

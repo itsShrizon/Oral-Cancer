@@ -4,7 +4,7 @@ This paper presented a parameter-efficient five-stage convolutional
 architecture for binary and multi-class oral disease classification. The
 architecture departs from a standard EfficientNetV2-B0 in two deliberately
 minimal ways: a custom AttentionHub replaces the donor Block-4, and the
-redundant tail --- Block-6 together with the convolutional head --- is removed.
+redundant tail (Block-6 together with the convolutional head) is removed.
 Through a seven-cell ablation of the AttentionHub, reinforced by a confirmatory
 negative-result run, we derived a \textbf{role-complementarity principle} that
 constrains how attention modules should be combined in this setting: pair
@@ -12,8 +12,8 @@ modules with disjoint functional roles, or pay a measurable accuracy penalty.
 The principle forced a sequential Triplet\arrowto{}SE cascade as the proposed
 \emph{AttentionHub-v2}, which under a matched fair training recipe attains
 $99.06\,\%$ binary accuracy and $99.51\,\%$ subtype accuracy on a seven-class
-held-out test set --- the highest subtype score in a benchmark of nine standard
-CNN and Transformer baselines --- at $4.79$~M parameters and $0.493$~GFLOPs,
+held-out test set, the highest subtype score in a benchmark of nine standard
+CNN and Transformer baselines, at $4.79$~M parameters and $0.493$~GFLOPs,
 making it $2.1\times$ smaller than EfficientNet~V2-B2 and $5.0\times$ smaller
 than Inception~V3, the two strongest baselines. Grad-CAM++ and LIME panels
 indicate that the model attends to lesion tissue rather than to incidental

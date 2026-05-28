@@ -1,65 +1,96 @@
 %% =====================================================================
 %%  A Parameter-Efficient Dual-Head Oral Disease Classifier
-%%  IEEE journal-style manuscript.
+%%  Springer Nature / npj journal-style manuscript.
 %%
-%%  BUILD (run from this directory):
+%%  BUILD (Overleaf or local TeX Live):
 %%     pdflatex main  ->  bibtex main  ->  pdflatex main  ->  pdflatex main
-%%  IEEEtran.cls and IEEEtran.bst are bundled in this directory, so the
-%%  paper compiles even though the local TeX Live does not have them
-%%  installed system-wide.  Compile FROM the paper/ directory.
+%%
+%%  Class file (sn-jnl.cls) and bib styles (sn-*.bst) are part of the
+%%  Springer Nature template and are pre-installed on Overleaf.
+%%
+%%  STYLE OPTION (\documentclass below):
+%%    sn-nature       - Nature-style numerical citations  (default here)
+%%    sn-vancouver-num- Vancouver numerical (medical/npj alternative)
+%%    sn-mathphys-num - Math / phys-sci numerical
+%%    sn-basic        - Basic numerical
+%%    sn-apa / sn-chicago / sn-vancouver-ay / sn-mathphys-ay  - author-year
+%%
+%%  To switch citation style, change ONLY the second option in the
+%%  \documentclass[...]{sn-jnl} line and the matching \bibliographystyle
+%%  at the bottom of this file.
 %% =====================================================================
-\documentclass[journal,a4paper]{IEEEtran}
 
-% ---- packages (all confirmed present in the local TeX Live 2025) -----
+\documentclass[pdflatex,sn-nature]{sn-jnl}
+
+% ---- standard SN package set + this paper's specific needs -----------
 \usepackage{graphicx}      % figure inclusion
-\usepackage{amsmath}       % math
-\usepackage{amssymb}       % math symbols
+\usepackage{multirow}      % tables
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 \usepackage{array}         % extended column specifiers
 \usepackage{tabularx}      % width-balanced tables
 \usepackage{dcolumn}       % decimal-point-aligned numeric columns
-\usepackage[hidelinks]{hyperref}   % hyperlinks (hidelinks => no xcolor needed)
-
-\interdisplaylinepenalty=2500       % IEEEtran recommendation (load after amsmath)
-
-%  NOTE: the bundled IEEEtran.cls carries a local patch that swaps the
-%  Times/Helvetica/Courier font defaults for Computer Modern, because
-%  this machine's TeX Live lacks the Times metrics.  See IEEEtran.cls
-%  near line 494.  Nothing else in the preamble is affected.
 
 \graphicspath{{figures/}}
-\DeclareGraphicsExtensions{.pdf,.png}
+\DeclareGraphicsExtensions{.pdf,.png,.eps}
 
 % ---- decimal-aligned numeric column type for the result tables -------
-%      usage in a tabular preamble:  d{4}  -> aligns numbers on the dot,
-%      4 digits after the point.
 \newcolumntype{d}[1]{D{.}{.}{#1}}
 
 % ---- small helpers ---------------------------------------------------
 \newcommand{\arrowto}{$\rightarrow$}        % Triplet -> SE cascade arrow
 
+\jyear{2026}
+
+%% ====================================================================
 \begin{document}
 
-\title{A Parameter-Efficient Dual-Head Oral Disease Classifier with an
+\title[Parameter-Efficient Oral Disease Classifier]%
+{A Parameter-Efficient Dual-Head Oral Disease Classifier with an
 Ablation-Driven Triplet\arrowto{}SE Attention Cascade}
 
-\author{First~Author,~Second~Author,~and~Third~Author% TODO(user): real names
-\thanks{Manuscript submitted \today.}% TODO(user): submission details
-\thanks{The authors are with [Department], [Institution], [City], [Country]
-(e-mail: corresponding.author@example.com).}}% TODO(user): affiliations
+% ---- AUTHORS (TODO: real names, ORCIDs, affiliations, emails) --------
+\author*[1]{\fnm{First} \sur{Author}}\email{first.author@example.com}
+
+\author[1]{\fnm{Second} \sur{Author}}\email{second.author@example.com}
+
+\author[1]{\fnm{Third} \sur{Author}}\email{third.author@example.com}
+
+\affil*[1]{\orgdiv{Department},
+           \orgname{Institution},
+           \orgaddress{\city{City},
+                       \postcode{00000},
+                       \state{State},
+                       \country{Country}}}
+
+% ---- ABSTRACT --------------------------------------------------------
+\abstract{\input{sections/00_abstract}}
+
+% ---- KEYWORDS --------------------------------------------------------
+\keywords{Oral disease classification,
+          Attention mechanisms,
+          Ablation study,
+          Parameter-efficient architectures,
+          EfficientNet,
+          Role complementarity,
+          Grad-CAM++,
+          LIME,
+          Dual-head multi-task learning,
+          Triplet Attention,
+          Squeeze-and-Excitation}
 
 \maketitle
 
-\begin{abstract}
-\input{sections/00_abstract}
-\end{abstract}
-
-\begin{IEEEkeywords}
-Oral disease classification, attention mechanisms, ablation study,
-parameter-efficient architectures, EfficientNet, role-complementarity,
-Grad-CAM++, LIME, dual-head multi-task learning, Triplet Attention,
-Squeeze-and-Excitation.
-\end{IEEEkeywords}
-
+% ---- BODY ------------------------------------------------------------
 \input{sections/01_introduction}
 \input{sections/02_related_work}
 \input{sections/03_preliminaries}
@@ -72,7 +103,9 @@ Squeeze-and-Excitation.
 \input{sections/10_conclusion}
 \input{sections/11_backmatter}
 
-\bibliographystyle{IEEEtran}
+% ---- BIBLIOGRAPHY ----------------------------------------------------
+% Switch sn-nature to one of the other sn-*.bst styles to change format.
+\bibliographystyle{sn-nature}
 \bibliography{paper}
 
 \end{document}

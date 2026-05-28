@@ -1,33 +1,40 @@
-\section*{Data and Code Availability}
+\bmhead{Data and Code Availability}
 
-The full source --- the training scripts (\texttt{train.py},
+The full source is publicly available at
+\url{https://github.com/itsShrizon/Oral-Cancer},
+comprising the training scripts (\texttt{train.py},
 \texttt{custom\_efficientnet\_colab.py}), the evaluation script
 (\texttt{evaluate\_final.py}), the explainability script
 (\texttt{explain\_model.py}), the computational-metrics pipeline
 (\texttt{compute\_model\_metrics.py}), and the ablation runner
-(\texttt{run\_ablation.py}) --- is committed alongside this manuscript,
-together with the per-model \texttt{classification\_metrics.json},
+(\texttt{run\_ablation.py}), together with the per-model
+\texttt{classification\_metrics.json},
 \texttt{performance\_metrics.json}, \texttt{training\_time.json},
 \texttt{evaluation\_results.txt}, \texttt{confusion\_matrices.png}, and
-\texttt{explain\_binary.png} / \texttt{explain\_subtype.png} artifacts. Dataset~1
-and Dataset~2 are pre-existing curated collections; redistribution of the
-original imagery is subject to the upstream dataset licenses. The model weights
-for the proposed v2 model
+\texttt{explain\_binary.png} / \texttt{explain\_subtype.png} artifacts.
+Dataset~1 (the \emph{Oral Images Dataset} of Chandrashekar~\textit{et~al.},
+Mendeley Data, DOI~\texttt{10.17632/mhjyrn35p4.2}, \textsc{cc by}~4.0)
+\cite{chandrashekar2021oral} and Dataset~2 (the \emph{Mouth and Oral
+Diseases} dataset of Rashid~\textit{et~al.}, distributed via Kaggle)
+\cite{rashid2022mod,ref19} are pre-existing curated public collections;
+redistribution of the original imagery is subject to the upstream dataset
+licenses. The model weights for the proposed v2 model
 (\texttt{results/\allowbreak custom\_\allowbreak efficientnet\_\allowbreak
 v2\_\allowbreak hub\_\allowbreak v2/\allowbreak best\_\allowbreak model.pth})
-and for every baseline and ablation cell are released for non-clinical research
-use under the terms specified in the repository.
+and for every baseline and ablation cell are released for non-clinical
+research use under the terms specified in the repository.
 
-\section*{Conflict of Interest}
+\bmhead{Competing Interests}
 
-The authors declare that they have no conflict of interest relevant to the
-content of this study. The proposed model is a research artifact and is not
-associated with any commercial diagnostic product.
+The authors declare no competing interests relevant to the content of this
+study. The proposed model is a research artifact and is not associated
+with any commercial diagnostic product.
 
-\section*{Acknowledgment}
+\bmhead{Acknowledgments}
 
 The authors thank the maintainers of the donor model in the \texttt{timm}
-library, the authors of the BAM, Triplet Attention, SE, and EMA modules whose
-designs are both adopted and ablated in this work, and the developers of the
-\texttt{pytorch-grad-cam}, \texttt{lime}, \texttt{thop}, and \texttt{codecarbon}
-libraries on which the reproducibility provisions of this study depend.
+library, the authors of the BAM, Triplet Attention, SE, and EMA modules
+whose designs are both adopted and ablated in this work, and the
+developers of the \texttt{pytorch-grad-cam}, \texttt{lime}, \texttt{thop},
+and \texttt{codecarbon} libraries on which the reproducibility provisions
+of this study depend.

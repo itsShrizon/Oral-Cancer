@@ -41,7 +41,7 @@ but does not differentiate among clinically distinct oral conditions.
 A complementary direction has combined hand-crafted and learned
 representations. The fusion of Local Binary Pattern (LBP) descriptors with deep
 CNN features has also been explored for oral cancer detection~\cite{ref17}. The
-contribution remains at the representation level --- the model still maps each
+contribution remains at the representation level: the model still maps each
 image to a binary outcome.
 
 Across this family of methods, the dominant limitation is not accuracy but
@@ -60,9 +60,9 @@ binary and the small dataset constrains generalization to broader oral disease
 populations.
 
 A recent systematic review by Tiwari \emph{et al.}~\cite{ref23} surveyed $23$
-artificial-intelligence studies on the diagnosis of mouth ulcers --- spanning
+artificial-intelligence studies on the diagnosis of mouth ulcers (spanning
 oral lichen planus (OLP), recurrent aphthous stomatitis, leukoplakia, and
-related conditions --- and reported accuracies ranging from $71\,\%$ to
+related conditions) and reported accuracies ranging from $71\,\%$ to
 $100\,\%$ depending on dataset size and architecture choice. The review
 highlights two persistent gaps: limited class balance across datasets, and the
 near-absence of explainability evidence. These gaps directly motivate the dual
@@ -117,8 +117,8 @@ MobileNetV2, InceptionResNetV2, and ResNet50 with an XGBoost meta-classifier and
 is evaluated on a separately curated collection of seven oral disease
 categories, where it is reported to reach roughly $99\,\%$ overall accuracy with
 feature fusion aiding discrimination between visually similar lesions. The
-architectural choices --- which backbones to ensemble, and why XGBoost as the
-meta-classifier --- are not subjected to ablation, and the substantial
+architectural choices (which backbones to ensemble, and why XGBoost as the
+meta-classifier) are not subjected to ablation, and the substantial
 cumulative parameter count of the combined model raises practical deployment
 concerns. Because that work is evaluated on a different seven-class collection,
 it does not constitute a controlled comparator for the present study; we cite
@@ -130,7 +130,7 @@ single-model alternative can be designed in a principled, ablation-driven way.
 
 Vision Transformer (ViT) architectures have also been explored for oral lesion
 analysis. Chilet-Martos \emph{et al.}~\cite{ref18} compared a ViT-based pipeline
---- combining DETR, the Segment Anything Model, and a ViT classifier ---
+(combining DETR, the Segment Anything Model, and a ViT classifier)
 against radiomics-based baselines, with the ViT pipeline reaching an accuracy of
 approximately $0.93$; the study is framed primarily as a model-type comparison
 between deep representation learning and hand-crafted radiomic features.
@@ -138,7 +138,7 @@ Hybrid CNN-Transformer designs that couple a DeiT branch with a CoAtNet branch
 have also been explored for image-based disease classification~\cite{ref21},
 typically taking the hybrid attention configuration as given rather than testing
 it through ablation. A distinct line of work has explored multimodal large
-language models as diagnostic assistants --- the evaluation in~\cite{ref24}
+language models as diagnostic assistants. The evaluation in~\cite{ref24}
 tested ChatGPT-5's ability to differentiate OLP, oral lichenoid lesions, and
 squamous-cell carcinoma developing over lichen planus on biopsy-confirmed cases,
 finding competitive but sub-expert performance that lagged human experts at the
@@ -151,7 +151,7 @@ The literature reviewed above reveals three gaps that motivate the present
 study. \emph{First}, binary formulations dominate; the few multi-class systems
 that exist~\cite{ref19,ref22} do not subject their architectural decisions to
 ablation. \emph{Second}, attention modules are stacked without principled
-justification --- the literature offers no empirically grounded rule for how
+justification: the literature offers no empirically grounded rule for how
 attention components should be combined on this distribution. \emph{Third},
 explainability evidence in the multi-class oral disease setting is sparse,
 leaving the field's high-accuracy claims clinically unverified.

@@ -4,7 +4,7 @@ A high test accuracy is necessary but not sufficient evidence that a
 medical-imaging classifier is clinically defensible: the model must also be
 shown to attend to lesion tissue rather than to incidental cues such as teeth,
 lip outlines, or lighting artifacts. To supply that evidence, every model in
-the study is accompanied by two complementary explanations for both heads ---
+the study is accompanied by two complementary explanations for both heads:
 a Gradient-weighted Class Activation Mapping++ (Grad-CAM++) saliency panel and
 a Local Interpretable Model-Agnostic Explanations (LIME) boundary-mask panel.
 The artifacts are produced by a single script, \texttt{explain\_model.py}, with
@@ -31,8 +31,8 @@ representation immediately consumed by the classification heads:
   is the last convolutional block.
   \item For Swin-T the target is the last attention block prior to global
   pooling.
-  \item For the proposed Custom EfficientNet~V2 the target is Stage~5 --- the
-  MBConv+SE block immediately downstream of the AttentionHub --- so that the
+  \item For the proposed Custom EfficientNet~V2 the target is Stage~5, the
+  MBConv+SE block immediately downstream of the AttentionHub, so that the
   map captures the feature representation the hub hands to Stage~5.
 \end{itemize}
 
@@ -40,9 +40,9 @@ representation immediately consumed by the classification heads:
 predicted argmax, and the resulting per-image attention map is overlaid on the
 input.
 
-Inspection of the proposed model's panels --- \texttt{explain\_binary.png} and
+Inspection of the proposed model's panels (\texttt{explain\_binary.png} and
 \texttt{explain\_subtype.png} of the \texttt{custom\_efficientnet\_v2\_hub\_v2}
-run --- reveals four recurring patterns. \emph{First}, lip-margin benign cases
+run) reveals four recurring patterns. \emph{First}, lip-margin benign cases
 receive broad, diffuse attention spread across the visible mucosal area with no
 focal fixation on the teeth, indicating that the model reasons over the
 lesion-bearing tissue rather than over incidental hard-tissue cues.
@@ -52,7 +52,7 @@ activation in the panel and is anatomically correct. \emph{Third},
 diffuse-mucosa malignant cases receive a distributed, multi-spot activation
 over the lesion region, which is appropriate for lesions whose boundary is not
 sharply defined. \emph{Fourth}, focal-bump malignant cases receive two crisp
-focal spots that coincide with the two visible bumps --- in clinical terms, the
+focal spots that coincide with the two visible bumps, in clinical terms the
 kind of annotation a junior clinician would draw on the image directly.
 
 A clarification on what this map does and does not probe is warranted. The
@@ -79,9 +79,9 @@ six hand-curated test cases that exhibit these patterns.
   \emph{LIME}). The cases span the binary head (a malignant ulcerated lesion)
   and the subtype head (CoS lip and perioral-skin lesions, an OC raised tongue
   lesion, a Gum inflamed lip margin, and OLP striations). Across all cases the
-  Grad-CAM++ peak coincides with the visible lesion --- a tight focal spot on
-  compact lesions and an elongated map tracing the contour of linear lesions
-  --- and the LIME contour traces the lesion boundary rather than surrounding
+  Grad-CAM++ peak coincides with the visible lesion, showing a tight focal spot on
+  compact lesions and an elongated map tracing the contour of linear lesions,
+  and the LIME contour traces the lesion boundary rather than surrounding
   teeth or skin.}
   \label{fig:xai_proposed}
 \end{figure*}
@@ -102,7 +102,7 @@ For the proposed model the two explanations are mutually consistent: the LIME
 masks align with the Grad-CAM++ heat-maps and with the visible lesion tissue
 across the curated cases of Figure~\ref{fig:xai_proposed}. The agreement is
 sharpest on the focal-bump cases, where the LIME boundaries are tight around
-the bumps themselves. This property is not universal across the benchmark ---
+the bumps themselves. This property is not universal across the benchmark:
 several baselines, notably ConvNeXt-Tiny under from-scratch training and Swin-T
 on small lesions, produce LIME boundaries that bleed into the teeth or the
 surrounding skin. The convergence of a gradient-based and a perturbation-based
@@ -132,7 +132,7 @@ negligible response on teeth or skin. The \emph{mid-tier} comprises ResNet50,
 DenseNet121, and EfficientNet-B0, which generally localize the lesion correctly
 but exhibit occasional spurious activation on lip outlines. The \emph{weakest}
 tier is ConvNeXt-Tiny, whose attention often broadens across the entire oral
-cavity without lesion-specific concentration --- a behaviour consistent with
+cavity without lesion-specific concentration, a behaviour consistent with
 its low quantitative accuracy (95.32\,\% binary, 90.46\,\% subtype, see
 Table~\ref{tab:benchmark}) and with its failure to reach the early-stopping
 criterion under from-scratch training.

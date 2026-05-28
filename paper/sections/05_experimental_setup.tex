@@ -21,10 +21,10 @@ across runs.
 
 The software stack is held fixed across all runs: Python~3.11 and
 PyTorch~2.x with CUDA~12; \texttt{timm}~0.9 for the structural definition of
-the donor EfficientNetV2-B0 backbone --- only the architectural reference is
-used, and the pre-trained weights are explicitly \emph{not} loaded, in
+the donor EfficientNetV2-B0 backbone, of which only the architectural reference
+is used (the pre-trained weights are explicitly \emph{not} loaded, in
 keeping with the from-scratch training protocol of
-Section~\ref{ssec:training}; \texttt{thop} for floating-point operation
+Section~\ref{ssec:training}); \texttt{thop} for floating-point operation
 counting; \texttt{pytorch-grad-cam}~1.5 for the Grad-CAM++ saliency maps;
 \texttt{lime}~0.2 together with \texttt{scikit-image} for the super-pixel
 boundary masks; and \texttt{codecarbon} for energy and
@@ -48,8 +48,8 @@ five axes.
   \item \textbf{Fixed split.} The dataset splits are deterministic functions
   of the seed, which makes train/test contamination across runs impossible
   by construction.
-  \item \textbf{Per-run JSON.} Every one of the ten models --- the nine
-  baseline backbones and the proposed model --- emits a
+  \item \textbf{Per-run JSON.} Every one of the ten models (the nine
+  baseline backbones and the proposed model) emits a
   \texttt{classification\_metrics.json}, a \texttt{performance\_metrics%
   .json}, a \texttt{training\_time.json}, and a per-class textual report
   (\texttt{evaluation\_results.txt}); all of these are committed alongside
@@ -63,7 +63,7 @@ five axes.
   model.
 \end{enumerate}
 
-A small number of runs --- the AttentionHub ablation cells --- include
+A small number of runs (the AttentionHub ablation cells) include
 \texttt{codecarbon}-measured energy and CO\textsubscript{2} figures, whereas
 the older baseline runs report the conservative analytical estimate used in
 the absence of \texttt{codecarbon} at the time those runs were executed. We
